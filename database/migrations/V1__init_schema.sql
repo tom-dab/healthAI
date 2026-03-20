@@ -4,7 +4,7 @@
 -- Responsable : Hanane
 -- ════════════════════════════════════════════════
 -- Ce script est exécuté automatiquement au premier
--- démarrage du container PostgreSQL.
+-- démarrage du container PostgreSQL
 -- ════════════════════════════════════════════════
 
 -- Extension pour les UUIDs
