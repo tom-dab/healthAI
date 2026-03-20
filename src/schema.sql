@@ -1,6 +1,6 @@
 -- ============================================================
 --  HealthAI Coach -- Schema de base de donnees
---  Version : 1.0
+--  Version : 2.0
 --  Moteur   : MariaDB / MySQL
 -- ============================================================
 
@@ -15,10 +15,10 @@ USE healthai_coach;
 CREATE TABLE IF NOT EXISTS users (
     id             INT AUTO_INCREMENT PRIMARY KEY,
     email          VARCHAR(150) NOT NULL UNIQUE,
-    age            INT,
+    age            TINYINT,
     genre          ENUM('M','F','autre') DEFAULT 'autre',
     poids_kg       DECIMAL(5,2),
-    taille_cm      INT,
+    taille_cm      SMALLINT,
     niveau_fitness ENUM('debutant','intermediaire','avance') DEFAULT 'debutant',
     created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS biometrics (
     user_id       INT NOT NULL,
     date_mesure   DATE NOT NULL,
     poids_kg      DECIMAL(5,2),
-    bpm_moyen     INT,
-    bpm_max       INT,
+    bpm_moyen     SMALLINT,
+    bpm_max       SMALLINT,
     bmi           DECIMAL(4,2),
     body_fat_pct  DECIMAL(4,2),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS foods (
     sucres_g       DECIMAL(6,2) DEFAULT 0,
     sodium_mg      DECIMAL(7,2) DEFAULT 0,
     cholesterol_mg DECIMAL(7,2) DEFAULT 0,
-    type_repas     VARCHAR(50) DEFAULT 'collation',
+    type_repas     VARCHAR(50)  DEFAULT 'collation',
     source_donnee  VARCHAR(100),
     created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS activity_logs (
     user_id          INT NOT NULL,
     exercise_id      INT,
     date_seance      DATE NOT NULL,
-    duree_min        INT,
+    duree_min        SMALLINT,
     calories_brulees DECIMAL(7,2),
     FOREIGN KEY (user_id)     REFERENCES users(id)     ON DELETE CASCADE,
     FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE SET NULL

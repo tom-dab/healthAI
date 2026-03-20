@@ -39,20 +39,26 @@ app.get("/charger-donnees", async (req, res) => {
         console.log("  HealthAI Coach — Pipeline ETL démarré");
         console.log("========================================\n");
 
-        console.log("📥 ÉTAPE 1/5 — foods");
-        await insertarFoods("./data/daily_food_nutrition_clean.csv");
+        // Chemins des fichiers CSV
+        const CSV_FOODS    = "./data/daily_food_nutrition_clean.csv";
+        const CSV_EXERCISE = "./data/gym_members_exercise_clean.csv";
+        const CSV_SYNTH    = "./data/gym_members_synthetic_clean.csv";
+        const CSV_DIET     = "./data/diet_recommendations_clean.csv";
 
-        console.log("\n📥 ÉTAPE 2/5 — users + biometrics");
-        await insertarUsers("./data/gym_members_exercise_clean.csv");
+        console.log("📥 ÉTAPE 1/5 — foods");
+        await insertarFoods(CSV_FOODS);
+
+        console.log("\n📥 ÉTAPE 2/5 — users + biometrics (exercise + synthetic)");
+        await insertarUsers(CSV_EXERCISE, CSV_SYNTH);
 
         console.log("\n📥 ÉTAPE 3/5 — user_goals");
-        await insertarUserGoals("./data/diet_recommendations_clean.csv");
+        await insertarUserGoals(CSV_DIET);
 
         console.log("\n📥 ÉTAPE 4/5 — exercises + activity_logs");
-        await insertarActivity("./data/gym_members_exercise_clean.csv");
+        await insertarActivity(CSV_EXERCISE, CSV_SYNTH);
 
         console.log("\n📥 ÉTAPE 5/5 — nutrition_logs");
-        await insertarNutritionLogs("./data/daily_food_nutrition_clean.csv");
+        await insertarNutritionLogs(CSV_FOODS);
 
         await verificationFinale();
 

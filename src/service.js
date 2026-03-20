@@ -21,6 +21,9 @@ function lireCSV(ruta) {
 // ═══════════════════════════════════════════════════════════════
 // 1. INSERTION — Table foods
 //    Source : daily_food_nutrition_clean.csv
+//    Colonnes : Food_Item, Category, Calories (kcal), Protein (g),
+//               Carbohydrates (g), Fat (g), Fiber (g), Sugars (g),
+//               Sodium (mg), Cholesterol (mg), Meal_Type, Water_Intake (ml)
 // ═══════════════════════════════════════════════════════════════
 async function insertarFoods(ruta) {
     console.log("📂 Lecture :", ruta);
@@ -39,16 +42,16 @@ async function insertarFoods(ruta) {
                  fibres_g, sucres_g, sodium_mg, cholesterol_mg, type_repas, source_donnee)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
-                    f["Food_Item"]         || f["nom"]          || null,
-                    f["Calories (kcal)"]   || f["calories_kcal"]|| 0,
-                    f["Protein (g)"]       || f["proteines_g"]  || 0,
-                    f["Carbohydrates (g)"] || f["glucides_g"]   || 0,
-                    f["Fat (g)"]           || f["lipides_g"]    || 0,
-                    f["Fiber (g)"]         || f["fibres_g"]     || 0,
-                    f["Sugars (g)"]        || f["sucres_g"]     || 0,
-                    f["Sodium (mg)"]       || f["sodium_mg"]    || 0,
-                    f["Cholesterol (mg)"]  || f["cholesterol_mg"]|| 0,
-                    ({"Breakfast":"petit_dejeuner","Lunch":"dejeuner","Dinner":"diner","Snack":"collation"}[f["Meal_Type"]] || f["type_repas"] || "collation"),
+                    f["Food_Item"]         || null,
+                    parseFloat(f["Calories (kcal)"])   || 0,
+                    parseFloat(f["Protein (g)"])        || 0,
+                    parseFloat(f["Carbohydrates (g)"])  || 0,
+                    parseFloat(f["Fat (g)"])            || 0,
+                    parseFloat(f["Fiber (g)"])          || 0,
+                    parseFloat(f["Sugars (g)"])         || 0,
+                    parseFloat(f["Sodium (mg)"])        || 0,
+                    parseFloat(f["Cholesterol (mg)"])   || 0,
+                    ({"Breakfast":"petit_dejeuner","Lunch":"dejeuner","Dinner":"diner","Snack":"collation"}[f["Meal_Type"]] || "collation"),
                     "kaggle_daily_food"
                 ]
             );
@@ -62,58 +65,70 @@ async function insertarFoods(ruta) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 2. INSERTION — Table users + biometrics + activity_logs
-//    Source : gym_members_exercise_clean.csv
+// 2. INSERTION — Table users + biometrics
+//    Source : gym_members_exercise_clean.csv  (973 lignes)
+//             gym_members_synthetic_clean.csv (1352 lignes)
+//    Colonnes : age, gender, weight_kg, height_m, max_bpm, avg_bpm,
+//               resting_bpm, session_duration_hours, calories_burned,
+//               workout_type, fat_percentage, bmi, experience_level
 // ═══════════════════════════════════════════════════════════════
-async function insertarUsers(ruta) {
-    console.log("📂 Lecture :", ruta);
-    const filas = await lireCSV(ruta);
-
+async function insertarUsers(rutaExercise, rutaSynthetic) {
     // Vider dans le bon ordre (FK)
     await pool.query("DELETE FROM activity_logs");
     await pool.query("DELETE FROM biometrics");
     await pool.query("DELETE FROM user_goals");
     await pool.query("DELETE FROM users");
 
+    // Combiner les deux sources
+    const sources = [];
+    if (rutaExercise) {
+        console.log("📂 Lecture :", rutaExercise);
+        const filas = await lireCSV(rutaExercise);
+        sources.push(...filas);
+    }
+    if (rutaSynthetic) {
+        console.log("📂 Lecture :", rutaSynthetic);
+        const filas = await lireCSV(rutaSynthetic);
+        sources.push(...filas);
+    }
+
     let ok = 0, err = 0;
 
-    for (let i = 0; i < filas.length; i++) {
-        const f     = filas[i];
+    for (let i = 0; i < sources.length; i++) {
+        const f     = sources[i];
         const email = `user${i + 1}@healthai.com`;
 
         // Mapping niveau fitness
-        const exp = parseFloat(f["experience_level"] || f["Experience_Level"] || 1);
-        const niveau = exp <= 1 ? "débutant" : exp <= 2 ? "intermédiaire" : "avancé";
+        const exp    = parseFloat(f["experience_level"] || f["Experience_Level"] || 1);
+        const niveau = exp <= 1 ? "debutant" : exp <= 2 ? "intermediaire" : "avance";
 
         // Mapping genre
         const genreRaw = (f["gender"] || f["Gender"] || "").trim();
-        const genre = genreRaw === "Male" ? "M" : genreRaw === "Female" ? "F" : "autre";
+        const genre    = genreRaw === "Male" ? "M" : genreRaw === "Female" ? "F" : "autre";
 
-        // Taille : convertir mètres → cm
-        const hauteurM  = parseFloat(f["height_m"]  || f["Height (m)"]  || 0);
-        const tailleCm  = hauteurM > 0 ? Math.round(hauteurM * 100) : null;
-        const poids     = parseFloat(f["weight_kg"] || f["Weight (kg)"] || 0) || null;
-        const age       = parseInt(f["age"]         || f["Age"]         || 0) || null;
+        // Taille : height_m → cm
+        const hauteurM = parseFloat(f["height_m"] || f["Height (m)"] || 0);
+        const tailleCm = hauteurM > 0 ? Math.round(hauteurM * 100) : null;
+        const poids    = parseFloat(f["weight_kg"] || f["Weight (kg)"] || 0) || null;
+        const age      = parseInt(f["age"]         || f["Age"]         || 0) || null;
 
         try {
-            // Insérer user
             await pool.query(
                 `INSERT INTO users (email, age, genre, poids_kg, taille_cm, niveau_fitness)
                  VALUES (?, ?, ?, ?, ?, ?)`,
                 [email, age, genre, poids, tailleCm, niveau]
             );
 
-            // Insérer biometrics
             await pool.query(
                 `INSERT INTO biometrics (user_id, date_mesure, poids_kg, bpm_moyen, bpm_max, bmi, body_fat_pct)
                  VALUES ((SELECT id FROM users WHERE email = ? LIMIT 1), CURDATE(), ?, ?, ?, ?, ?)`,
                 [
                     email,
                     poids,
-                    parseFloat(f["avg_bpm"]         || f["Avg BPM"]         || 0) || null,
-                    parseFloat(f["max_bpm"]         || f["Max BPM"]         || 0) || null,
-                    parseFloat(f["bmi"]             || f["BMI"]             || 0) || null,
-                    parseFloat(f["fat_percentage"]  || f["Fat Percentage"]  || 0) || null,
+                    parseFloat(f["avg_bpm"]        || f["Avg BPM"]        || 0) || null,
+                    parseFloat(f["max_bpm"]        || f["Max BPM"]        || 0) || null,
+                    parseFloat(f["bmi"]            || f["BMI"]            || 0) || null,
+                    parseFloat(f["fat_percentage"] || f["Fat Percentage"] || 0) || null,
                 ]
             );
 
@@ -129,20 +144,26 @@ async function insertarUsers(ruta) {
 // ═══════════════════════════════════════════════════════════════
 // 3. INSERTION — Table user_goals
 //    Source : diet_recommendations_clean.csv
+//    Colonnes : Patient_ID, Age, Gender, Weight_kg, Height_cm,
+//               BMI, Disease_Type, Severity, Daily_Caloric_Intake,
+//               Diet_Recommendation
 // ═══════════════════════════════════════════════════════════════
 async function insertarUserGoals(ruta) {
     console.log("📂 Lecture :", ruta);
     const filas = await lireCSV(ruta);
 
+    // Nombre total d'users insérés
+    const [[{ total }]] = await pool.query("SELECT COUNT(*) AS total FROM users");
+
     let ok = 0, err = 0;
 
-    for (let i = 0; i < Math.min(filas.length, 973); i++) {
+    for (let i = 0; i < Math.min(filas.length, total); i++) {
         const f     = filas[i];
         const email = `user${i + 1}@healthai.com`;
 
-        // Mapping objectif
-        const disease = (f["Disease_Type"]      || "").toLowerCase();
-        const rec     = (f["Diet_Recommendation"]|| "").toLowerCase();
+        // Mapping objectif depuis Disease_Type et Diet_Recommendation
+        const disease = (f["Disease_Type"]       || "").toLowerCase();
+        const rec     = (f["Diet_Recommendation"] || "").toLowerCase();
         let objectif  = "maintien";
         if (disease.includes("obes") || rec.includes("loss"))    objectif = "perte_poids";
         else if (rec.includes("muscle") || rec.includes("gain")) objectif = "prise_masse";
@@ -167,20 +188,30 @@ async function insertarUserGoals(ruta) {
 
 // ═══════════════════════════════════════════════════════════════
 // 4. INSERTION — Table exercises + activity_logs
-//    Source : gym_members_exercise_clean.csv
+//    Source : gym_members_exercise_clean.csv + gym_members_synthetic_clean.csv
 // ═══════════════════════════════════════════════════════════════
-async function insertarActivity(ruta) {
-    console.log("📂 Lecture :", ruta);
-    const filas = await lireCSV(ruta);
+async function insertarActivity(rutaExercise, rutaSynthetic) {
+    // Combiner les deux sources (même ordre que insertarUsers)
+    const sources = [];
+    if (rutaExercise) {
+        const filas = await lireCSV(rutaExercise);
+        sources.push(...filas);
+    }
+    if (rutaSynthetic) {
+        const filas = await lireCSV(rutaSynthetic);
+        sources.push(...filas);
+    }
 
     // Exercices uniques
-    const exercicesUniques = [...new Set(filas.map(f => f["workout_type"] || f["Workout_Type"]).filter(Boolean))];
+    const exercicesUniques = [...new Set(
+        sources.map(f => f["workout_type"] || f["Workout_Type"]).filter(Boolean)
+    )];
 
     for (let ex of exercicesUniques) {
         try {
             await pool.query(
                 `INSERT IGNORE INTO exercises (nom, type_exercice, muscle_cible, equipement, niveau)
-                 VALUES (?, 'cardio_muscu', 'multiple', 'variable', 'intermédiaire')`,
+                 VALUES (?, 'cardio_muscu', 'multiple', 'variable', 'intermediaire')`,
                 [ex]
             );
         } catch (e) {
@@ -191,8 +222,8 @@ async function insertarActivity(ruta) {
 
     // Activity logs
     let ok = 0, err = 0;
-    for (let i = 0; i < filas.length; i++) {
-        const f        = filas[i];
+    for (let i = 0; i < sources.length; i++) {
+        const f        = sources[i];
         const email    = `user${i + 1}@healthai.com`;
         const exercice = f["workout_type"] || f["Workout_Type"] || null;
         const dureeH   = parseFloat(f["session_duration_hours"] || 0);
@@ -203,8 +234,8 @@ async function insertarActivity(ruta) {
             await pool.query(
                 `INSERT INTO activity_logs (user_id, exercise_id, date_seance, duree_min, calories_brulees)
                  VALUES (
-                     (SELECT id FROM users    WHERE email = ? LIMIT 1),
-                     (SELECT id FROM exercises WHERE nom  = ? LIMIT 1),
+                     (SELECT id FROM users     WHERE email = ? LIMIT 1),
+                     (SELECT id FROM exercises WHERE nom   = ? LIMIT 1),
                      CURDATE(), ?, ?
                  )`,
                 [email, exercice, dureeMin, calories]
@@ -220,7 +251,6 @@ async function insertarActivity(ruta) {
 
 // ═══════════════════════════════════════════════════════════════
 // 5. INSERTION — Table nutrition_logs
-//    Lie les users aux aliments
 // ═══════════════════════════════════════════════════════════════
 async function insertarNutritionLogs(ruta) {
     console.log("📂 Lecture :", ruta);
@@ -233,15 +263,18 @@ async function insertarNutritionLogs(ruta) {
         "Snack":     "collation"
     };
 
+    // Nombre total d'users
+    const [[{ total }]] = await pool.query("SELECT COUNT(*) AS total FROM users");
+
     let ok = 0, err = 0;
     const today = new Date().toISOString().split("T")[0];
 
     for (let i = 0; i < filas.length; i++) {
-        const f        = filas[i];
-        const userNum  = (i % 973) + 1;
-        const email    = `user${userNum}@healthai.com`;
-        const nomFood  = f["Food_Item"] || f["nom"] || null;
-        const repas    = repasMap[f["Meal_Type"]] || f["type_repas"] || "collation";
+        const f       = filas[i];
+        const userNum = (i % total) + 1;
+        const email   = `user${userNum}@healthai.com`;
+        const nomFood = f["Food_Item"] || null;
+        const repas   = repasMap[f["Meal_Type"]] || "collation";
 
         try {
             await pool.query(
