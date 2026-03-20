@@ -1,36 +1,75 @@
 export default function Table({ data }) {
 
-  if (!data || !data.length) return <p>No data</p>;
+  if (!data || !data.length) return (
+    <div style={{
+      background: "white",
+      padding: "40px",
+      borderRadius: "12px",
+      textAlign: "center",
+      color: "#7f8c8d"
+    }}>
+      <p>No data available</p>
+    </div>
+  );
 
   const keys = Object.keys(data[0]);
 
   return (
-    <table style={{
-      width: "100%",
-      borderCollapse: "collapse",
-      background: "#fff"
+    <div style={{
+      background: "white",
+      borderRadius: "12px",
+      overflow: "hidden",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)"
     }}>
-      <thead>
-        <tr>
-          {keys.map(k => (
-            <th key={k} style={{ borderBottom: "1px solid #ccc", padding: "10px" }}>
-              {k}
-            </th>
-          ))}
-        </tr>
-      </thead>
-
-      <tbody>
-        {data.map((row, i) => (
-          <tr key={i}>
+      <table style={{
+        width: "100%",
+        borderCollapse: "collapse"
+      }}>
+        <thead>
+          <tr style={{
+            background: "linear-gradient(135deg, #f8f9fa 0%, #f0f1f3 100%)",
+            borderBottom: "2px solid #e2e8f0"
+          }}>
             {keys.map(k => (
-              <td key={k} style={{ padding: "10px" }}>
-                {row[k]}
-              </td>
+              <th key={k} style={{
+                padding: "16px 12px",
+                textAlign: "left",
+                fontSize: "12px",
+                fontWeight: "600",
+                color: "#475569",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px"
+              }}>
+                {k}
+              </th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+
+        <tbody>
+          {data.map((row, i) => (
+            <tr 
+              key={i}
+              style={{
+                borderBottom: "1px solid #f1f5f9",
+                transition: "background 0.2s ease"
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = "#f8f9fa"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+            >
+              {keys.map(k => (
+                <td key={k} style={{
+                  padding: "14px 12px",
+                  color: "#334155",
+                  fontSize: "14px"
+                }}>
+                  {row[k]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
