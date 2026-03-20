@@ -11,6 +11,6 @@
 # CMD ["npm", "run", "dev"]
 
 # ─── Option B : Serveur statique (HTML/CSS/JS) ───
-FROM nginx:alpine
-COPY . /usr/share/nginx/html
-EXPOSE 3000
+# FROM nginx:alpine
+# COPY . /usr/share/nginx/html
+# EXPOSE 3000
