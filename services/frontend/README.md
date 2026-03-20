@@ -1,22 +1,26 @@
 # Frontend — HealthAI Coach
 Responsable : Hélie
 
-## Stack technique
-- À définir par Hélie (React, Vue, ou HTML/CSS/JS pur)
+## Lib
 
-## Structure à compléter
-```
-frontend/
-├── Dockerfile        ← à créer
+- React (Vite)
+- Axios (communication API)
+- React Router (navigation)
+- Chart.js (visualisation des données)
+- HTML / CSS (inline styling)
+
+---
+
+## Structure
+
+services/frontend/
+├── Dockerfile
 ├── src/
-│   ├── pages/        ← pages de l'interface admin
-│   ├── components/   ← composants réutilisables
-│   └── api/          ← appels à l'API REST
-└── package.json      ← ou requirements si pas de Node
-```
-
-## Interface attendue
-- Dashboard de pilotage (KPIs temps réel)
-- Outil de visualisation des anomalies ETL
-- Formulaire d'export des données nettoyées
-- Conformité RGAA niveau AA
+│ ├── components/ → Card, Table, Loader
+│ ├── layout/ → Layout global + Sidebar
+│ ├── pages/ → Dashboard, Users, DataQuality...
+│ ├── charts/ → Graphiques (Chart.js)
+│ └── services/ → appels API (axios)
+├── package.json
+├── vite.config.js
+└── index.html
