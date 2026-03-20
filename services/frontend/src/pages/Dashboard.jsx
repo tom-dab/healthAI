@@ -5,7 +5,9 @@ import UsersChart from "../charts/UsersChart";
 
 export default function Dashboard() {
 
-  const [metrics, setMetrics] = null;
+  const handleExport = () => {
+    window.open("http://localhost:8000/export", "_blank");
+  };
 
   const [data, setData] = useState(null);
 
@@ -22,10 +24,13 @@ export default function Dashboard() {
 
       <h1>Dashboard</h1>
 
-      <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+      <div style={{ display: "flex", gap: "20px", marginBottom: "20px", alignItems: "center" }}>
         <Card title="Users" value={data.users} />
         <Card title="Avg Calories" value={data.avg_calories} />
         <Card title="Top Goal" value={data.top_goal} />
+        <button onClick={handleExport} style={{ height: "40px", padding: "0 12px" }}>
+          Export Data
+        </button>
       </div>
 
       <div style={{
