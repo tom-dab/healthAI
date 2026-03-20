@@ -66,7 +66,7 @@ docker compose ps
 
 | Service     | URL                          | Description                     |
 |-------------|------------------------------|---------------------------------|
-| API REST    | http://localhost:8000        | FastAPI + doc Swagger            |
+| API REST    | http://localhost:8000        | FastAPI + doc Swagger           |
 | API Docs    | http://localhost:8000/docs   | Documentation OpenAPI           |
 | Frontend    | http://localhost:3000        | Interface web d'administration  |
 | Metabase    | http://localhost:3001        | Dashboard analytique            |
