@@ -2,8 +2,8 @@ import pandas as pd
 import os
 from datetime import datetime
 
-# ── Configuration ─────────────────────────────────────────
-DATA_DIR = r"C:\Users\houss\Desktop\healthai-coach\data\raw"
+DATA_DIR     = r"C:\Users\houss\Desktop\healthai\healthAI\services\etl\data\raw"
+rapport_path = r"C:\Users\houss\Desktop\healthai\healthAI\services\etl\rapport_inventaire.md"
 
 DATASETS = {
     "daily_food_nutrition":  "daily_food_nutrition_dataset.csv",
@@ -12,15 +12,12 @@ DATASETS = {
     "gym_members_synthetic": "gym_members_exercise_tracking_synthetic_data.csv",
 }
 
-# ── Chargement + Analyse ───────────────────────────────────
 rapports = []
 
 for name, file in DATASETS.items():
     path = os.path.join(DATA_DIR, file)
     try:
-        df = pd.read_csv(path, on_bad_lines='skip')
-
-        # Analyse qualité
+        df             = pd.read_csv(path, on_bad_lines='skip')
         nb_lignes      = len(df)
         nb_colonnes    = len(df.columns)
         nb_doublons    = df.duplicated().sum()
@@ -28,14 +25,14 @@ for name, file in DATASETS.items():
         types_colonnes = df.dtypes.astype(str).to_dict()
 
         rapports.append({
-            "name":           name,
-            "file":           file,
-            "status":         "OK",
-            "lignes":         nb_lignes,
-            "colonnes":       nb_colonnes,
-            "doublons":       nb_doublons,
-            "manquants":      valeurs_manq,
-            "types":          types_colonnes,
+            "name":     name,
+            "file":     file,
+            "status":   "OK",
+            "lignes":   nb_lignes,
+            "colonnes": nb_colonnes,
+            "doublons": nb_doublons,
+            "manquants": valeurs_manq,
+            "types":    types_colonnes,
         })
 
         print(f"✅ {name} — {nb_lignes} lignes x {nb_colonnes} colonnes")
@@ -49,9 +46,6 @@ for name, file in DATASETS.items():
         })
         print(f"❌ {name} : {e}\n")
 
-# ── Génération rapport Markdown ────────────────────────────
-rapport_path = r"C:\Users\houss\Desktop\healthai-coach\rapport_inventaire.md"
-
 with open(rapport_path, "w", encoding="utf-8") as f:
     f.write("# Rapport d'inventaire des sources de données\n\n")
     f.write(f"**Projet** : HealthAI Coach — Backend Métier  \n")
@@ -60,8 +54,8 @@ with open(rapport_path, "w", encoding="utf-8") as f:
 
     for r in rapports:
         f.write(f"## {r['name']}\n\n")
-        f.write(f"| Propriété | Valeur |\n")
-        f.write(f"|-----------|--------|\n")
+        f.write("| Propriété | Valeur |\n")
+        f.write("|-----------|--------|\n")
         f.write(f"| Fichier   | `{r['file']}` |\n")
         f.write(f"| Statut    | {r['status']} |\n")
         f.write(f"| Lignes    | {r['lignes']} |\n")
@@ -69,14 +63,14 @@ with open(rapport_path, "w", encoding="utf-8") as f:
         f.write(f"| Doublons  | {r['doublons']} |\n")
 
         if r['manquants']:
-            f.write(f"\n**Valeurs manquantes :**\n\n")
+            f.write("\n**Valeurs manquantes :**\n\n")
             for col, nb in r['manquants'].items():
                 f.write(f"- `{col}` : {nb} valeurs manquantes\n")
         else:
-            f.write(f"\n✅ Aucune valeur manquante\n")
+            f.write("\n✅ Aucune valeur manquante\n")
 
         if r['types']:
-            f.write(f"\n**Types des colonnes :**\n\n")
+            f.write("\n**Types des colonnes :**\n\n")
             for col, typ in r['types'].items():
                 f.write(f"- `{col}` : {typ}\n")
 
