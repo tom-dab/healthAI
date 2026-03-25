@@ -1,7 +1,7 @@
 # Rapport de nettoyage des données
 
 **Projet** : HealthAI Coach — Backend Métier  
-**Généré le** : 22/03/2026 à 16:05  
+**Généré le** : 25/03/2026 à 19:01  
 
 ---
 
@@ -31,7 +31,15 @@
 | Lignes conservées | 973 |
 | Fichier produit | `gym_members_exercise_clean.csv` |
 
+## gym_members_synthetic
 
+| Action | Détail |
+|--------|--------|
+| Correction type | Max_BPM converti str → float64 |
+| Lignes supprimées | 448 lignes incomplètes |
+| Lignes avant | 1800 |
+| Lignes après | 1352 |
+| Fichier produit | `gym_members_synthetic_clean.csv` |
 
 ---
 
@@ -43,12 +51,3 @@
 | diet_recommendations | 1000 | 1000 | 100% |
 | gym_members_exercise | 973 | 973 | 100% |
 | gym_members_synthetic | 1800 | 1352 | 75.1% |
-## gym_members_synthetic
-
-| Action | Détail |
-|--------|--------|
-| Correction type | Max_BPM converti str → float64 |
-| Lignes supprimées | 448 lignes incomplètes |
-| Lignes avant | 1800 |
-| Lignes après | 1352 |
-| Fichier produit | `gym_members_synthetic_clean.csv` |

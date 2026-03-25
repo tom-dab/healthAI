@@ -15,7 +15,6 @@ Closes #<!-- numéro de l'issue si applicable -->
 - [ ] Je n'ai pas commité de fichier `.env` ou de secrets
 
 ## 🧪 Comment tester
-
 <!-- Étapes pour tester manuellement cette PR -->
 1. 
 2. 
