@@ -23,17 +23,17 @@ async function initDB() {
         const sqlPath = path.join(__dirname, "schema.sql");
         const sql     = fs.readFileSync(sqlPath, "utf8");
 
-        console.log("📂 Exécution de schema.sql...");
+        console.log(" Exécution de schema.sql...");
         await connexion.query(sql);
 
-        console.log("✅ Base de données 'healthai_coach' créée");
-        console.log("✅ Tables : users, biometrics, foods, exercises,");
+        console.log(" Base de données 'healthai_coach' créée");
+        console.log(" Tables : users, biometrics, foods, exercises,");
         console.log("            user_goals, activity_logs, nutrition_logs");
-        console.log("\n🎉 Initialisation terminée !");
-        console.log("👉 Lance maintenant : GET /charger-donnees\n");
+        console.log("\n Initialisation terminée !");
+        console.log(" Lance maintenant : GET /charger-donnees\n");
 
     } catch (error) {
-        console.error("❌ Erreur lors de l'initialisation :", error.message);
+        console.error(" Erreur lors de l'initialisation :", error.message);
         throw error;
     } finally {
         await connexion.end();
