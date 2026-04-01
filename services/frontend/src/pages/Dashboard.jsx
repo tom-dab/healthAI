@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMetrics, getUsers } from "../services/api";
+import { usersAPI } from "../services/api";
 import Card from "../components/Card";
 import UsersChart from "../charts/UsersChart";
 
@@ -13,12 +13,44 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const metricsRes = await getMetrics();
-        setData(metricsRes.data);
+
+        // Charger les utilisateurs
+        const usersRes = await usersAPI.getUsers({ limit: 1000 });
+        const users = usersRes.data;
+
+        // Calculer des métriques simples
+        const metrics = {
+          total_users: users.length,
+          users_by_plan: {},
+          users_by_gender: {},
+          avg_weight: 0,
+          avg_height: 0
+        };
+
+        // Statistiques par plan
+        users.forEach(user => {
+          metrics.users_by_plan[user.plan] = (metrics.users_by_plan[user.plan] || 0) + 1;
+          metrics.users_by_gender[user.gender] = (metrics.users_by_gender[user.gender] || 0) + 1;
+
+          if (user.weight) metrics.avg_weight += user.weight;
+          if (user.height) metrics.avg_height += user.height;
+        });
+
+        metrics.avg_weight = users.length > 0 ? (metrics.avg_weight / users.length).toFixed(1) : 0;
+        metrics.avg_height = users.length > 0 ? (metrics.avg_height / users.length).toFixed(1) : 0;
+
+        setData(metrics);
         setError(null);
       } catch (err) {
-        setError("Failed to load metrics");
-        setData({});
+        console.error("Erreur chargement dashboard:", err);
+        setError("Failed to load dashboard data");
+        setData({
+          total_users: 0,
+          users_by_plan: {},
+          users_by_gender: {},
+          avg_weight: 0,
+          avg_height: 0
+        });
       } finally {
         setLoading(false);
       }
@@ -28,12 +60,12 @@ export default function Dashboard() {
 
   const handleExport = () => {
     if (!data) return;
-    
+
     const csvContent = [
       ["Metric", "Value"],
-      ["Users", data.users || 0],
-      ["Avg Calories", data.avg_calories || 0],
-      ["Top Goal", data.top_goal || "N/A"],
+      ["Total Users", data.total_users || 0],
+      ["Avg Weight (kg)", data.avg_weight || 0],
+      ["Avg Height (cm)", data.avg_height || 0],
       ["Export Date", new Date().toISOString()]
     ].map(row => row.join(",")).join("\n");
 
@@ -41,8 +73,7 @@ export default function Dashboard() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `health-metrics-${new Date().toISOString().split("T")[0]}.csv`;
-    document.body.appendChild(link);
+    link.download = `health-dashboard-${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
