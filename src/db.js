@@ -3,7 +3,7 @@ const mysql = require("mysql2/promise");
 const pool = mysql.createPool({
     host: "localhost",
     user: "root",
-    password: "",          // Ton mot de passe WAMP
+    password: "",          // mot de passe WAMP
     database: "healthai_coach",
     port: 3307,
     charset: "utf8mb4"
