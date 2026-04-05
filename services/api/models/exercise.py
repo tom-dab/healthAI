@@ -4,7 +4,7 @@ Modèle SQLAlchemy pour exercises et workout_logs
 """
 from datetime import datetime
 import uuid
-from sqlalchemy import Column, String, Text, Integer, ForeignKey, Index
+from sqlalchemy import Column, String, Text, Integer, Numeric, DateTime, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID
 
 from core.database import Base

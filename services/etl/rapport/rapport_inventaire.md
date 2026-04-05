@@ -1,7 +1,7 @@
 # Rapport d'inventaire des sources de données
 
 **Projet** : HealthAI Coach — Backend Métier  
-**Généré le** : 05/04/2026 à 14:35  
+**Généré le** : 05/04/2026 à 17:28  
 
 ---
 
@@ -19,8 +19,8 @@
 
 **Types des colonnes :**
 
-- `Food_Item` : str
-- `Category` : str
+- `Food_Item` : object
+- `Category` : object
 - `Calories (kcal)` : int64
 - `Protein (g)` : float64
 - `Carbohydrates (g)` : float64
@@ -29,7 +29,7 @@
 - `Sugars (g)` : float64
 - `Sodium (mg)` : int64
 - `Cholesterol (mg)` : int64
-- `Meal_Type` : str
+- `Meal_Type` : object
 - `Water_Intake (ml)` : int64
 
 ---
@@ -52,26 +52,26 @@
 
 **Types des colonnes :**
 
-- `Patient_ID` : str
+- `Patient_ID` : object
 - `Age` : int64
-- `Gender` : str
+- `Gender` : object
 - `Weight_kg` : float64
 - `Height_cm` : int64
 - `BMI` : float64
-- `Disease_Type` : str
-- `Severity` : str
-- `Physical_Activity_Level` : str
+- `Disease_Type` : object
+- `Severity` : object
+- `Physical_Activity_Level` : object
 - `Daily_Caloric_Intake` : int64
 - `Cholesterol_mg/dL` : float64
 - `Blood_Pressure_mmHg` : int64
 - `Glucose_mg/dL` : float64
-- `Dietary_Restrictions` : str
-- `Allergies` : str
-- `Preferred_Cuisine` : str
+- `Dietary_Restrictions` : object
+- `Allergies` : object
+- `Preferred_Cuisine` : object
 - `Weekly_Exercise_Hours` : float64
 - `Adherence_to_Diet_Plan` : float64
 - `Dietary_Nutrient_Imbalance_Score` : float64
-- `Diet_Recommendation` : str
+- `Diet_Recommendation` : object
 
 ---
 
@@ -90,7 +90,7 @@
 **Types des colonnes :**
 
 - `Age` : int64
-- `Gender` : str
+- `Gender` : object
 - `Weight (kg)` : float64
 - `Height (m)` : float64
 - `Max_BPM` : int64
@@ -98,7 +98,7 @@
 - `Resting_BPM` : int64
 - `Session_Duration (hours)` : float64
 - `Calories_Burned` : float64
-- `Workout_Type` : str
+- `Workout_Type` : object
 - `Fat_Percentage` : float64
 - `Water_Intake (liters)` : float64
 - `Workout_Frequency (days/week)` : int64
@@ -138,15 +138,15 @@
 **Types des colonnes :**
 
 - `Age` : float64
-- `Gender` : str
+- `Gender` : object
 - `Weight (kg)` : float64
 - `Height (m)` : float64
-- `Max_BPM` : str
+- `Max_BPM` : object
 - `Avg_BPM` : float64
 - `Resting_BPM` : float64
 - `Session_Duration (hours)` : float64
 - `Calories_Burned` : float64
-- `Workout_Type` : str
+- `Workout_Type` : object
 - `Fat_Percentage` : float64
 - `Water_Intake (liters)` : float64
 - `Workout_Frequency (days/week)` : float64

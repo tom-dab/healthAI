@@ -110,7 +110,7 @@ services:
   # DASHBOARD METABASE (Houssem)
   # ─────────────────────────────────────────────
   metabase:
-    image: metabase/metabase:v0.50.0
+    image: metabase/metabase:latest
     container_name: healthai_metabase
     restart: unless-stopped
     environment:
