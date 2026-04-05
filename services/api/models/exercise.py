@@ -7,7 +7,7 @@ import uuid
 from sqlalchemy import Column, String, Text, Integer, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID
 
-from ..core.database import Base
+from core.database import Base
 
 
 class Exercise(Base):
