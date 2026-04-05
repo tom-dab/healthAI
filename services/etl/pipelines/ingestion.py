@@ -2,8 +2,11 @@ import pandas as pd
 import os
 from datetime import datetime
 
-DATA_DIR     = r"C:\Users\houss\Desktop\healthai\healthAI\services\etl\data\raw"
-RAPPORT_DIR  = r"C:\Users\houss\Desktop\healthai\healthAI\services\etl\rapport"
+# ── Chemins depuis variables d'environnement Docker ────────────
+# DATA_DIR et RAPPORT_DIR sont définis dans docker-compose.yml
+# Valeurs par défaut pour exécution locale hors Docker
+DATA_DIR    = os.getenv("DATA_DIR",    "/app/data/raw")
+RAPPORT_DIR = os.getenv("RAPPORT_DIR", "/app/rapport")
 
 os.makedirs(RAPPORT_DIR, exist_ok=True)
 
@@ -29,14 +32,14 @@ for name, file in DATASETS.items():
         types_colonnes = df.dtypes.astype(str).to_dict()
 
         rapports.append({
-            "name":      name,
-            "file":      file,
-            "status":    "OK",
-            "lignes":    nb_lignes,
-            "colonnes":  nb_colonnes,
-            "doublons":  nb_doublons,
+            "name":     name,
+            "file":     file,
+            "status":   "OK",
+            "lignes":   nb_lignes,
+            "colonnes": nb_colonnes,
+            "doublons": nb_doublons,
             "manquants": valeurs_manq,
-            "types":     types_colonnes,
+            "types":    types_colonnes,
         })
 
         print(f"✅ {name} — {nb_lignes} lignes x {nb_colonnes} colonnes")
@@ -80,4 +83,4 @@ with open(rapport_path, "w", encoding="utf-8") as f:
 
         f.write("\n---\n\n")
 
-print(f"📄 Rapport inventaire généré : {rapport_path}")
+print(f"📄 Rapport généré : {rapport_path}")

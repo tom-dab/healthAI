@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 
 # Import des configurations
 from core.config import settings
-from core.database import engine, Base
+from core.database import engine, Base, SessionLocal
 
 # Import des modèles (crucial pour que SQLAlchemy les crée)
 from models.user import User  # noqa: F401

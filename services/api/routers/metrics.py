@@ -7,11 +7,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import Dict, Any
 
-from ..core.database import get_db
-from ..core.security import get_current_admin_user
-from ..models.user import User
-from ..models.nutrition import NutritionItem, FoodLog
-from ..models.exercise import Exercise, WorkoutLog
+from core.database import get_db
+from core.security import get_current_admin_user
+from models.user import User
+from models.nutrition import NutritionItem, FoodLog
+from models.exercise import Exercise, WorkoutLog
 
 router = APIRouter(prefix="/api/v1", tags=["metrics"])
 

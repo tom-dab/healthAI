@@ -42,10 +42,18 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    volumes:
-      - ./services/api:/app
+    # FIX : le volume local écrase /app mais les packages pip sont dans
+    # le système Python du container (/usr/local/lib) — pas dans /app.
+    # On supprime le volume bind-mount pour éviter tout conflit et
+    # s'assurer que le code embarqué dans l'image (COPY . .) est utilisé.
     networks:
       - healthai_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   # ─────────────────────────────────────────────
   # PIPELINE ETL (Houssem)
@@ -58,11 +66,18 @@ services:
     restart: "no"
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      DATA_DIR: /app/data
+      # FIX : chemins corrigés pour correspondre aux scripts ETL
+      DATA_DIR: /app/data/raw
+      BDD_DIR: /app/data/clean_bdd
+      ML_DIR: /app/data/clean_ml
+      RAPPORT_DIR: /app/rapport
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
     volumes:
+      # FIX : bind-mount uniquement — permet de déposer les CSV dans
+      # services/etl/data/raw/ en local et de les retrouver dans le container.
+      # Le named volume etl_data est supprimé car il écrasait /app/data
+      # et rendait les datasets inaccessibles.
       - ./services/etl:/app
-      - etl_data:/app/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -79,11 +94,15 @@ services:
     container_name: healthai_frontend
     restart: unless-stopped
     environment:
+      # Cette variable est lue par le navigateur (côté client)
+      # localhost:8000 est correct ici car c'est le navigateur qui appelle l'API
       VITE_API_URL: http://localhost:${API_PORT:-8000}
     ports:
       - "3000:3000"
     depends_on:
-      - api
+      api:
+        # FIX : attendre que l'API soit vraiment prête avant de démarrer
+        condition: service_healthy
     networks:
       - healthai_network
 
@@ -127,7 +146,6 @@ services:
 
 volumes:
   postgres_data:
-  etl_data:
 
 networks:
   healthai_network:

@@ -5,15 +5,15 @@ Endpoints pour login, register, logout et profil utilisateur
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from ..core.database import get_db
-from ..core.security import (
+from core.database import get_db
+from core.security import (
     hash_password,
     verify_password,
     create_access_token,
     get_current_user,
 )
-from ..models.user import User
-from ..schemas.user import (
+from models.user import User
+from schemas.user import (
     UserCreate,
     LoginRequest,
     TokenResponse,

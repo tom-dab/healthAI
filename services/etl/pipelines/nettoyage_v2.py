@@ -3,10 +3,11 @@ import os
 from datetime import datetime
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
-DATA_DIR    = r"C:\Users\houss\Desktop\healthai\healthAI\services\etl\data\raw"
-BDD_DIR     = r"C:\Users\houss\Desktop\healthai\healthAI\services\etl\data\clean_bdd"
-ML_DIR      = r"C:\Users\houss\Desktop\healthai\healthAI\services\etl\data\clean_ml"
-RAPPORT_DIR = r"C:\Users\houss\Desktop\healthai\healthAI\services\etl\rapport"
+# ── Chemins depuis variables d'environnement Docker ────────────
+DATA_DIR    = os.getenv("DATA_DIR",    "/app/data/raw")
+BDD_DIR     = os.getenv("BDD_DIR",     "/app/data/clean_bdd")
+ML_DIR      = os.getenv("ML_DIR",      "/app/data/clean_ml")
+RAPPORT_DIR = os.getenv("RAPPORT_DIR", "/app/rapport")
 
 os.makedirs(BDD_DIR,     exist_ok=True)
 os.makedirs(ML_DIR,      exist_ok=True)
@@ -115,13 +116,11 @@ with open(rapport_path, "w", encoding="utf-8") as f:
     f.write(f"**Projet** : HealthAI Coach — Backend Métier  \n")
     f.write(f"**Généré le** : {datetime.now().strftime('%d/%m/%Y à %H:%M')}  \n\n")
     f.write("---\n\n")
-
     f.write("## Stratégie de nettoyage\n\n")
     f.write("| Destination | Stratégie |\n|-------------|----------|\n")
     f.write("| BDD | Suppression doublons, correction types, NULL conservés |\n")
     f.write("| Machine Learning | Suppression NULL, encodage texte, normalisation StandardScaler |\n\n")
     f.write("---\n\n")
-
     f.write("## Bilan BDD\n\n")
     f.write("| Dataset | Lignes | Actions |\n|---------|--------|--------|\n")
     f.write(f"| daily_food_nutrition  | {len(food_bdd)} | Doublons supprimés, NULL conservés |\n")
@@ -129,7 +128,6 @@ with open(rapport_path, "w", encoding="utf-8") as f:
     f.write(f"| gym_members_exercise  | {len(gym_bdd)} | Colonnes normalisées |\n")
     f.write(f"| gym_members_synthetic | {len(synt_bdd)} | Max_BPM corrigé, NULL conservés |\n\n")
     f.write("---\n\n")
-
     f.write("## Bilan Machine Learning\n\n")
     f.write("| Dataset | Lignes avant | Lignes après | Actions |\n|---------|-------------|--------------|--------|\n")
     f.write(f"| daily_food_nutrition  | 645  | {len(food_ml)} | Doublons + NULL supprimés, encodage, normalisation |\n")

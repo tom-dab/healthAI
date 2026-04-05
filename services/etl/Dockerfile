@@ -12,7 +12,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Créer les dossiers de données
-RUN mkdir -p data/raw data/processed data/cleaned logs
+# Créer les dossiers de données attendus par les scripts
+RUN mkdir -p data/raw data/clean_bdd data/clean_ml rapport logs
 
-CMD ["python", "run_pipeline.py"]
+# Lancer le pipeline depuis le dossier pipelines/
+# Le WORKDIR est /app, donc les imports entre fichiers du même dossier fonctionnent
+CMD ["sh", "-c", "cd /app/pipelines && python run_pipeline.py"]
