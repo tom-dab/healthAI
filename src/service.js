@@ -24,7 +24,7 @@ function lireCSV(ruta) {
 //               sodium_mg, cholesterol_mg, meal_type, water_intake_ml
 // ═══════════════════════════════════════════════════════════════
 async function insertarFoods(ruta) {
-    console.log("📂 Lecture :", ruta);
+    console.log(" Lecture :", ruta);
     const filas = await lireCSV(ruta);
 
     await pool.query("DELETE FROM nutrition_logs");
@@ -64,11 +64,11 @@ async function insertarFoods(ruta) {
             );
             ok++;
         } catch (e) {
-            console.warn("   ⚠️  Ligne ignorée (foods):", f["food_item"], "→", e.message);
+            console.warn("   Ligne ignorée (foods):", f["food_item"], "→", e.message);
             err++;
         }
     }
-    console.log(`✅ foods : ${ok} insérés, ${err} erreurs`);
+    console.log(`foods : ${ok} insérés, ${err} erreurs`);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -89,11 +89,11 @@ async function insertarUsers(rutaExercise, rutaSynthetic) {
 
     const sources = [];
     if (rutaExercise) {
-        console.log("📂 Lecture :", rutaExercise);
+        console.log(" Lecture :", rutaExercise);
         sources.push(...await lireCSV(rutaExercise));
     }
     if (rutaSynthetic) {
-        console.log("📂 Lecture :", rutaSynthetic);
+        console.log(" Lecture :", rutaSynthetic);
         sources.push(...await lireCSV(rutaSynthetic));
     }
 
@@ -139,11 +139,11 @@ async function insertarUsers(rutaExercise, rutaSynthetic) {
 
             ok++;
         } catch (e) {
-            console.warn("   ⚠️  User ignoré:", email, "→", e.message);
+            console.warn("     User ignoré:", email, "→", e.message);
             err++;
         }
     }
-    console.log(`✅ users + biometrics : ${ok} insérés, ${err} erreurs`);
+    console.log(` users + biometrics : ${ok} insérés, ${err} erreurs`);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -152,7 +152,7 @@ async function insertarUsers(rutaExercise, rutaSynthetic) {
 //    Toutes les colonnes sont maintenant exploitées
 // ═══════════════════════════════════════════════════════════════
 async function insertarUserGoals(ruta) {
-    console.log("📂 Lecture :", ruta);
+    console.log(" Lecture :", ruta);
     const filas = await lireCSV(ruta);
 
     const [[{ total }]] = await pool.query("SELECT COUNT(*) AS total FROM users");
@@ -228,11 +228,11 @@ async function insertarUserGoals(ruta) {
 
             ok++;
         } catch (e) {
-            console.warn("   ⚠️  Goal/Profile ignoré:", email, "→", e.message);
+            console.warn("     Goal/Profile ignoré:", email, "→", e.message);
             err++;
         }
     }
-    console.log(`✅ health_profiles + user_goals : ${ok} insérés, ${err} erreurs`);
+    console.log(` health_profiles + user_goals : ${ok} insérés, ${err} erreurs`);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -257,10 +257,10 @@ async function insertarActivity(rutaExercise, rutaSynthetic) {
                 [ex]
             );
         } catch (e) {
-            console.warn("   ⚠️  Exercice ignoré:", ex);
+            console.warn("     Exercice ignoré:", ex);
         }
     }
-    console.log(`✅ exercises : ${exercicesUniques.length} types insérés`);
+    console.log(` exercises : ${exercicesUniques.length} types insérés`);
 
     let ok = 0, err = 0;
     for (let i = 0; i < sources.length; i++) {
@@ -283,11 +283,11 @@ async function insertarActivity(rutaExercise, rutaSynthetic) {
             );
             ok++;
         } catch (e) {
-            console.warn("   ⚠️  Activity ignorée:", email, "→", e.message);
+            console.warn("     Activity ignorée:", email, "→", e.message);
             err++;
         }
     }
-    console.log(`✅ activity_logs : ${ok} insérés, ${err} erreurs`);
+    console.log(` activity_logs : ${ok} insérés, ${err} erreurs`);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -295,7 +295,7 @@ async function insertarActivity(rutaExercise, rutaSynthetic) {
 //    Source : daily_food_nutrition_bdd.csv
 // ═══════════════════════════════════════════════════════════════
 async function insertarNutritionLogs(ruta) {
-    console.log("📂 Lecture :", ruta);
+    console.log(" Lecture :", ruta);
     const filas = await lireCSV(ruta);
 
     const repasMap = {
@@ -329,11 +329,11 @@ async function insertarNutritionLogs(ruta) {
             );
             ok++;
         } catch (e) {
-            console.warn("   ⚠️  Nutrition log ignoré ligne", i, "→", e.message);
+            console.warn("     Nutrition log ignoré ligne", i, "→", e.message);
             err++;
         }
     }
-    console.log(`✅ nutrition_logs : ${ok} insérés, ${err} erreurs`);
+    console.log(` nutrition_logs : ${ok} insérés, ${err} erreurs`);
 }
 
 // ═══════════════════════════════════════════════════════════════

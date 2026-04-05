@@ -4,9 +4,9 @@ const path  = require("path");
 
 // ── Connexion SANS base de données (pour pouvoir la créer) ────
 async function initDB() {
-    console.log("\n========================================");
+    console.log("\n.");
     console.log("  HealthAI Coach — Initialisation BDD");
-    console.log("========================================\n");
+    console.log(".\n");
 
     // Connexion sans spécifier la base (elle n'existe pas encore)
     const connexion = await mysql.createConnection({
