@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
-import { usersAPI } from "../services/api";
+import { usersAPI, exercisesAPI, nutritionAPI } from "../services/api";
 import Card from "../components/Card";
-import UsersChart from "../charts/UsersChart";
 
 export default function Dashboard() {
-
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,43 +11,71 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
+        console.log("[Dashboard] Fetching data...");
 
-        // Charger les utilisateurs
-        const usersRes = await usersAPI.getUsers({ limit: 1000 });
-        const users = usersRes.data;
+        // Charger les utilisateurs, exercices, et aliments
+        const [usersRes, exercisesRes, nutritionRes] = await Promise.all([
+          usersAPI.getUsers({ limit: 1000 }),
+          exercisesAPI.getExercises({ limit: 1000 }),
+          nutritionAPI.getNutritionItems({ limit: 1000 })
+        ]);
 
-        // Calculer des métriques simples
-        const metrics = {
-          total_users: users.length,
-          users_by_plan: {},
-          users_by_gender: {},
-          avg_weight: 0,
-          avg_height: 0
-        };
+        const users = usersRes.data?.items || usersRes.data || [];
+        const exercises = exercisesRes.data || [];
+        const nutrition = nutritionRes.data || [];
 
-        // Statistiques par plan
+        console.log("[Dashboard] Data loaded:", { users: users.length, exercises: exercises.length, nutrition: nutrition.length });
+
+        // Calculer les métriques
+        let total_weight = 0;
+        let total_height = 0;
+        const plans = {};
+        const genders = {};
+        let user_count_with_weight = 0;
+        let user_count_with_height = 0;
+
         users.forEach(user => {
-          metrics.users_by_plan[user.plan] = (metrics.users_by_plan[user.plan] || 0) + 1;
-          metrics.users_by_gender[user.gender] = (metrics.users_by_gender[user.gender] || 0) + 1;
-
-          if (user.weight) metrics.avg_weight += user.weight;
-          if (user.height) metrics.avg_height += user.height;
+          // Plans
+          plans[user.plan] = (plans[user.plan] || 0) + 1;
+          
+          // Genders
+          genders[user.gender] = (genders[user.gender] || 0) + 1;
+          
+          // Weight & Height
+          if (user.weight_kg) {
+            total_weight += user.weight_kg;
+            user_count_with_weight++;
+          }
+          if (user.height_cm) {
+            total_height += user.height_cm;
+            user_count_with_height++;
+          }
         });
 
-        metrics.avg_weight = users.length > 0 ? (metrics.avg_weight / users.length).toFixed(1) : 0;
-        metrics.avg_height = users.length > 0 ? (metrics.avg_height / users.length).toFixed(1) : 0;
+        const metrics = {
+          total_users: users.length,
+          total_exercises: exercises.length,
+          total_nutrition_items: nutrition.length,
+          avg_weight: user_count_with_weight > 0 ? (total_weight / user_count_with_weight).toFixed(1) : 0,
+          avg_height: user_count_with_height > 0 ? (total_height / user_count_with_height).toFixed(1) : 0,
+          users_by_plan: plans,
+          users_by_gender: genders
+        };
 
+        console.log("[Dashboard] Metrics:", metrics);
         setData(metrics);
         setError(null);
       } catch (err) {
-        console.error("Erreur chargement dashboard:", err);
-        setError("Failed to load dashboard data");
+        console.error("[Dashboard] Error:", err);
+        setError("Erreur au chargement des données du dashboard");
         setData({
           total_users: 0,
-          users_by_plan: {},
-          users_by_gender: {},
+          total_exercises: 0,
+          total_nutrition_items: 0,
           avg_weight: 0,
-          avg_height: 0
+          avg_height: 0,
+          users_by_plan: {},
+          users_by_gender: {}
         });
       } finally {
         setLoading(false);
@@ -64,8 +90,12 @@ export default function Dashboard() {
     const csvContent = [
       ["Metric", "Value"],
       ["Total Users", data.total_users || 0],
+      ["Total Exercises", data.total_exercises || 0],
+      ["Total Nutrition Items", data.total_nutrition_items || 0],
       ["Avg Weight (kg)", data.avg_weight || 0],
       ["Avg Height (cm)", data.avg_height || 0],
+      ["Plans", JSON.stringify(data.users_by_plan)],
+      ["Genders", JSON.stringify(data.users_by_gender)],
       ["Export Date", new Date().toISOString()]
     ].map(row => row.join(",")).join("\n");
 
@@ -75,7 +105,6 @@ export default function Dashboard() {
     link.href = url;
     link.download = `health-dashboard-${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
-    document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
 
@@ -136,54 +165,76 @@ export default function Dashboard() {
         gap: "20px",
         marginBottom: "32px"
       }}>
-        <Card title="Total Users" value={data?.users || 0} />
-        <Card title="Avg Calories" value={(data?.avg_calories || 0).toFixed(0)} />
-        <Card title="Top Goal" value={data?.top_goal || "—"} />
-      </div>
-
-      <div style={{
-        background: "white",
-        padding: "24px",
-        borderRadius: "12px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-        marginBottom: "32px"
-      }}>
-        <h2 style={{ margin: "0 0 20px 0", fontSize: "18px", fontWeight: "600", color: "#1a1a1a" }}>
-          Users by Age Group
-        </h2>
-        <UsersChart />
+        <Card title="👥 Total Users" value={data?.total_users || 0} icon="👥" />
+        <Card title="💪 Exercises Available" value={data?.total_exercises || 0} icon="💪" />
+        <Card title="🍎 Nutrition Items" value={data?.total_nutrition_items || 0} icon="🍎" />
+        <Card title="⚖️ Avg Weight (kg)" value={data?.avg_weight || 0} icon="⚖️" />
+        <Card title="📏 Avg Height (cm)" value={data?.avg_height || 0} icon="📏" />
       </div>
 
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-        gap: "20px"
+        gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+        gap: "20px",
+        marginBottom: "32px"
       }}>
         <div style={{
           background: "white",
-          padding: "20px",
+          padding: "24px",
           borderRadius: "12px",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)"
         }}>
-          <p style={{ margin: "0", color: "#7f8c8d", fontSize: "12px", fontWeight: "600", textTransform: "uppercase" }}>
-            Status
-          </p>
-          <p style={{ margin: "12px 0 0 0", fontSize: "20px", fontWeight: "700", color: "#27ae60" }}>
-            ✓ Active
-          </p>
+          <h3 style={{ margin: "0 0 16px 0", fontSize: "16px", fontWeight: "600", color: "#1a1a1a" }}>
+            📊 Users by Plan
+          </h3>
+          {Object.entries(data?.users_by_plan || {}).map(([plan, count]) => (
+            <div key={plan} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0f0f0" }}>
+              <span style={{ color: "#666", fontSize: "14px" }}>{plan}</span>
+              <span style={{ fontWeight: "600", color: "#2980b9" }}>{count}</span>
+            </div>
+          ))}
         </div>
+
         <div style={{
           background: "white",
-          padding: "20px",
+          padding: "24px",
           borderRadius: "12px",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)"
         }}>
-          <p style={{ margin: "0", color: "#7f8c8d", fontSize: "12px", fontWeight: "600", textTransform: "uppercase" }}>
-            System Health
-          </p>
-          <p style={{ margin: "12px 0 0 0", fontSize: "20px", fontWeight: "700", color: "#2980b9" }}>
-            Optimal
-          </p>
+          <h3 style={{ margin: "0 0 16px 0", fontSize: "16px", fontWeight: "600", color: "#1a1a1a" }}>
+            👨‍👩 Users by Gender
+          </h3>
+          {Object.entries(data?.users_by_gender || {}).map(([gender, count]) => (
+            <div key={gender} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0f0f0" }}>
+              <span style={{ color: "#666", fontSize: "14px" }}>{gender || "Not specified"}</span>
+              <span style={{ fontWeight: "600", color: "#27ae60" }}>{count}</span>
+            </div>
+          ))}
+        </div>
+
+        <div style={{
+          background: "white",
+          padding: "24px",
+          borderRadius: "12px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)"
+        }}>
+          <h3 style={{ margin: "0 0 16px 0", fontSize: "16px", fontWeight: "600", color: "#1a1a1a" }}>
+            📈 Quick Stats
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ color: "#666" }}>Active Users:</span>
+              <span style={{ fontWeight: "600", color: "#e74c3c" }}>{data?.total_users || 0}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ color: "#666" }}>Total Resources:</span>
+              <span style={{ fontWeight: "600", color: "#9b59b6" }}>{(data?.total_exercises || 0) + (data?.total_nutrition_items || 0)}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ color: "#666" }}>System Status:</span>
+              <span style={{ fontWeight: "600", color: "#27ae60" }}>✓ Operational</span>
+            </div>
+          </div>
         </div>
       </div>
 

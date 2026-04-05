@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "http://localhost:9000",
   timeout: 5000
 });
 
@@ -61,9 +61,9 @@ export const exercisesAPI = {
 };
 
 // ─── FONCTIONS DE COMPATIBILITÉ (pour migration progressive) ───
-export const getUsers = () => usersAPI.getUsers();
-export const getExercises = () => exercisesAPI.getExercises();
-export const getFoods = () => nutritionAPI.getNutritionItems();
+export const getUsers = () => usersAPI.getUsers({ limit: 1000 });
+export const getExercises = () => exercisesAPI.getExercises({ limit: 1000 });
+export const getFoods = () => nutritionAPI.getNutritionItems({ limit: 1000 });
 export const getMetrics = () => Promise.resolve({ data: [] }); // TODO: implémenter métriques
 
 export default api;
