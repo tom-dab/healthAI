@@ -1,7 +1,24 @@
 import { useState } from "react";
 
-export default function Card({ title, value, icon = "📊" }) {
+export default function Card({ title, value, icon = "📊", children }) {
   const [isHovered, setIsHovered] = useState(false);
+
+  // Si children sont fournis, rendre juste un wrapper de carte
+  if (children) {
+    return (
+      <div 
+        style={{
+          background: "linear-gradient(135deg, #ffffff 0%, #f5f6fa 100%)",
+          padding: "24px",
+          borderRadius: "12px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+          border: "1px solid rgba(52, 152, 219, 0.1)",
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div 

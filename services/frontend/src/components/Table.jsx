@@ -1,18 +1,23 @@
 export default function Table({ data }) {
+  console.log("[Table] Rendering with data:", data ? `${data.length} items` : "no data", data);
 
-  if (!data || !data.length) return (
-    <div style={{
-      background: "white",
-      padding: "40px",
-      borderRadius: "12px",
-      textAlign: "center",
-      color: "#7f8c8d"
-    }}>
-      <p>No data available</p>
-    </div>
-  );
+  if (!data || !data.length) {
+    console.log("[Table] No data - showing empty message");
+    return (
+      <div style={{
+        background: "white",
+        padding: "40px",
+        borderRadius: "12px",
+        textAlign: "center",
+        color: "#7f8c8d"
+      }}>
+        <p>No data available</p>
+      </div>
+    );
+  }
 
   const keys = Object.keys(data[0]);
+  console.log("[Table] Keys extracted:", keys);
 
   return (
     <div style={{
@@ -47,27 +52,30 @@ export default function Table({ data }) {
         </thead>
 
         <tbody>
-          {data.map((row, i) => (
-            <tr 
-              key={i}
-              style={{
-                borderBottom: "1px solid #f1f5f9",
-                transition: "background 0.2s ease"
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = "#f8f9fa"}
-              onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
-            >
-              {keys.map(k => (
-                <td key={k} style={{
-                  padding: "14px 12px",
-                  color: "#334155",
-                  fontSize: "14px"
-                }}>
-                  {row[k]}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {data.map((row, i) => {
+            console.log(`[Table] Rendering row ${i}:`, row);
+            return (
+              <tr 
+                key={i}
+                style={{
+                  borderBottom: "1px solid #f1f5f9",
+                  transition: "background 0.2s ease"
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = "#f8f9fa"}
+                onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+              >
+                {keys.map(k => (
+                  <td key={k} style={{
+                    padding: "14px 12px",
+                    color: "#334155",
+                    fontSize: "14px"
+                  }}>
+                    {row[k] ? String(row[k]).substring(0, 50) : "-"}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

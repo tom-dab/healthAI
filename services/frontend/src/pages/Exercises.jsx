@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { exercisesAPI } from "../services/api";
 import Table from "../components/Table";
 import Loader from "../components/Loader";
 import Card from "../components/Card";
+import styles from "./NutritionExercises.module.css";
 
 export default function Exercises() {
   const [exercises, setExercises] = useState(null);
@@ -14,42 +15,84 @@ export default function Exercises() {
     search: ""
   });
 
-  useEffect(() => {
-    loadExercises();
-  }, [filters]);
-
-  const loadExercises = async () => {
+  const loadExercises = useCallback(async () => {
     try {
       setLoading(true);
-      const params = {};
+      const params = { limit: 1000 };
       if (filters.type) params.type = filters.type;
       if (filters.muscle_group) params.muscle_group = filters.muscle_group;
       if (filters.difficulty) params.difficulty = filters.difficulty;
       if (filters.search) params.search = filters.search;
 
+      console.log("[Exercises] Loading with params:", params);
       const response = await exercisesAPI.getExercises(params);
-      setExercises(response.data);
+      console.log("[Exercises] Response received:", response.data);
+      
+      // Handle both direct arrays and paginated responses
+      const data = response.data?.items || response.data || [];
+      console.log("[Exercises] Extracted data:", Array.isArray(data) ? `Array of ${data.length}` : "Not an array");
+      console.log("[Exercises] Setting state with:", data);
+      setExercises(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Erreur chargement exercices:", error);
+      console.error("[Exercises] ERROR:", error.response?.status, error.response?.data, error.message);
       setExercises([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    loadExercises();
+  }, [filters, loadExercises]);
 
   const handleFilterChange = (field, value) => {
     setFilters(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleExport = () => {
+    if (!exercises || exercises.length === 0) {
+      alert("Aucune donnée à exporter");
+      return;
+    }
+    const dataStr = JSON.stringify(exercises, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `exercises_${new Date().toISOString().split("T")[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleAddExercise = () => {
+    const name = prompt("Nom de l'exercice:");
+    if (!name) return;
+    const type = prompt("Type (Strength/Cardio/Flexibility):");
+    const muscle = prompt("Groupe musculaire:");
+    alert("Ajout d'exercices non implémenté dans cette version démo");
+  };
+
   if (loading) return <Loader />;
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className={`space-y-6 ${styles.container}`}>
+      <div className={styles.header}>
         <h1 className="text-3xl font-bold text-gray-900">Exercices</h1>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-          Ajouter un exercice
-        </button>
+        <div className={styles.actions}>
+          <button
+            className={styles.exportBtn}
+            onClick={handleExport}
+            title="Export exercises data"
+          >
+            📥 Export JSON
+          </button>
+          <button 
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            onClick={handleAddExercise}
+          >
+            ➕ Ajouter
+          </button>
+        </div>
       </div>
 
       {/* Filtres */}
@@ -123,11 +166,17 @@ export default function Exercises() {
       {/* Liste des exercices */}
       <Card>
         {exercises && exercises.length > 0 ? (
-          <Table data={exercises} />
+          <>
+            {console.log("[Exercises] Rendering Table with exercises:", exercises.length)}
+            <Table data={exercises} />
+          </>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <>
+            {console.log("[Exercises] NOT rendering Table. exercises state:", exercises)}
+            <div className="text-center py-8 text-gray-500">
             Aucun exercice trouvé
           </div>
+          </>
         )}
       </Card>
     </div>

@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { nutritionAPI } from "../services/api";
 import Table from "../components/Table";
 import Loader from "../components/Loader";
 import Card from "../components/Card";
+import styles from "./NutritionExercises.module.css";
 
 export default function Nutrition() {
   const [nutritionItems, setNutritionItems] = useState(null);
@@ -12,40 +13,81 @@ export default function Nutrition() {
     search: ""
   });
 
-  useEffect(() => {
-    loadNutritionItems();
-  }, [filters]);
-
-  const loadNutritionItems = async () => {
+  const loadNutritionItems = useCallback(async () => {
     try {
       setLoading(true);
-      const params = {};
+      const params = { limit: 1000 };
       if (filters.category) params.category = filters.category;
       if (filters.search) params.search = filters.search;
 
+      console.log("[Nutrition] Loading with params:", params);
       const response = await nutritionAPI.getNutritionItems(params);
-      setNutritionItems(response.data);
+      console.log("[Nutrition] Response received:", response.data);
+      
+      // Handle both direct arrays and paginated responses
+      const data = response.data?.items || response.data || [];
+      console.log("[Nutrition] Extracted data:", Array.isArray(data) ? `Array of ${data.length}` : "Not an array");
+      console.log("[Nutrition] Setting state with:", data);
+      setNutritionItems(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Erreur chargement aliments:", error);
+      console.error("[Nutrition] ERROR:", error.response?.status, error.response?.data, error.message);
       setNutritionItems([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    loadNutritionItems();
+  }, [filters, loadNutritionItems]);
 
   const handleFilterChange = (field, value) => {
     setFilters(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleExport = () => {
+    if (!nutritionItems || nutritionItems.length === 0) {
+      alert("Aucune donnée à exporter");
+      return;
+    }
+    const dataStr = JSON.stringify(nutritionItems, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `nutrition_${new Date().toISOString().split("T")[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleAddNutrition = () => {
+    const name = prompt("Nom de l'aliment:");
+    if (!name) return;
+    const category = prompt("Catégorie:");
+    alert("Ajout d'aliments non implémenté dans cette version démo");
+  };
+
   if (loading) return <Loader />;
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className={`space-y-6 ${styles.container}`}>
+      <div className={styles.header}>
         <h1 className="text-3xl font-bold text-gray-900">Nutrition</h1>
-        <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-          Ajouter un aliment
-        </button>
+        <div className={styles.actions}>
+          <button
+            className={styles.exportBtn}
+            onClick={handleExport}
+            title="Export nutrition data"
+          >
+            📥 Export JSON
+          </button>
+          <button 
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+            onClick={handleAddNutrition}
+          >
+            ➕ Ajouter
+          </button>
+        </div>
       </div>
 
       {/* Filtres */}
@@ -88,11 +130,17 @@ export default function Nutrition() {
       {/* Liste des aliments */}
       <Card>
         {nutritionItems && nutritionItems.length > 0 ? (
-          <Table data={nutritionItems} />
+          <>
+            {console.log("[Nutrition] Rendering Table with items:", nutritionItems.length)}
+            <Table data={nutritionItems} />
+          </>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <>
+            {console.log("[Nutrition] NOT rendering Table. nutritionItems state:", nutritionItems)}
+            <div className="text-center py-8 text-gray-500">
             Aucun aliment trouvé
           </div>
+          </>
         )}
       </Card>
     </div>
