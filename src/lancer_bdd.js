@@ -10,9 +10,9 @@ const {
 
 async function lancer() {
     try {
-        console.log("\n========================================");
+         console.log("\n                                                ");
         console.log("  HealthAI Coach — Lancement BDD");
-        console.log("========================================\n");
+       
 
         // ÉTAPE 1 — Créer les tables
         console.log("ÉTAPE 1/5 — Initialisation de la base de données...");
@@ -44,9 +44,9 @@ async function lancer() {
         // VÉRIFICATION FINALE
         await verificationFinale();
 
-        console.log("\n===");
+       
         console.log("  BDD prête ");
-        console.log("===\n");
+        
 
         process.exit(0);
 
