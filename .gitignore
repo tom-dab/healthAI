@@ -62,3 +62,10 @@ logs/
 *.swo
 .DS_Store
 Thumbs.db
+
+# ─── Datasets ETL & Environnement virtuel ETL ────
+# Datasets ETL (fichiers volumineux, ne pas pousser sur GitHub)
+services/etl/data/
+
+# Environnement virtuel Python
+services/etl/venv/
