@@ -3,7 +3,11 @@ import os
 from datetime import datetime
 
 DATA_DIR     = r"C:\Users\houss\Desktop\healthai\healthAI\services\etl\data\raw"
-rapport_path = r"C:\Users\houss\Desktop\healthai\healthAI\services\etl\rapport_inventaire.md"
+RAPPORT_DIR  = r"C:\Users\houss\Desktop\healthai\healthAI\services\etl\rapport"
+
+os.makedirs(RAPPORT_DIR, exist_ok=True)
+
+rapport_path = os.path.join(RAPPORT_DIR, "rapport_inventaire.md")
 
 DATASETS = {
     "daily_food_nutrition":  "daily_food_nutrition_dataset.csv",
@@ -25,14 +29,14 @@ for name, file in DATASETS.items():
         types_colonnes = df.dtypes.astype(str).to_dict()
 
         rapports.append({
-            "name":     name,
-            "file":     file,
-            "status":   "OK",
-            "lignes":   nb_lignes,
-            "colonnes": nb_colonnes,
-            "doublons": nb_doublons,
+            "name":      name,
+            "file":      file,
+            "status":    "OK",
+            "lignes":    nb_lignes,
+            "colonnes":  nb_colonnes,
+            "doublons":  nb_doublons,
             "manquants": valeurs_manq,
-            "types":    types_colonnes,
+            "types":     types_colonnes,
         })
 
         print(f"✅ {name} — {nb_lignes} lignes x {nb_colonnes} colonnes")
@@ -76,4 +80,4 @@ with open(rapport_path, "w", encoding="utf-8") as f:
 
         f.write("\n---\n\n")
 
-print("📄 Rapport généré : rapport_inventaire.md")
+print(f"📄 Rapport inventaire généré : {rapport_path}")
