@@ -7,10 +7,10 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List
 
-from ..core.database import get_db
-from ..core.security import get_current_user, get_current_admin_user
-from ..models.nutrition import NutritionItem, FoodLog
-from ..schemas.nutrition import (
+from core.database import get_db
+from core.security import get_current_user, get_current_admin_user
+from models.nutrition import NutritionItem, FoodLog
+from schemas.nutrition import (
     NutritionItemOut, NutritionItemCreate, NutritionItemUpdate,
     FoodLogCreate, FoodLogOut
 )
