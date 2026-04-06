@@ -1,7 +1,7 @@
 # Rapport d'inventaire des sources de données
 
 **Projet** : HealthAI Coach — Backend Métier  
-**Généré le** : 06/04/2026 à 11:52  
+**Généré le** : 06/04/2026 à 13:08  
 
 ---
 
@@ -9,11 +9,13 @@
 
 | Propriété | Valeur |
 |-----------|--------|
-| Fichier   | `daily_food_nutrition_dataset.csv` |
-| Statut    | OK |
-| Lignes    | 645 |
-| Colonnes  | 12 |
-| Doublons  | 54 |
+| Fichier         | `daily_food_nutrition_dataset.csv` |
+| Statut          | OK |
+| Lignes brutes   | 651 |
+| Lignes chargées | 645 |
+| Lignes sautées  | 6 ⚠️ lignes corrompues |
+| Colonnes        | 12 |
+| Doublons        | 54 |
 
 ✅ Aucune valeur manquante
 
@@ -38,11 +40,13 @@
 
 | Propriété | Valeur |
 |-----------|--------|
-| Fichier   | `diet_recommendations_dataset.csv` |
-| Statut    | OK |
-| Lignes    | 1000 |
-| Colonnes  | 20 |
-| Doublons  | 0 |
+| Fichier         | `diet_recommendations_dataset.csv` |
+| Statut          | OK |
+| Lignes brutes   | 1000 |
+| Lignes chargées | 1000 |
+| Lignes sautées  | 0 |
+| Colonnes        | 20 |
+| Doublons        | 0 |
 
 **Valeurs manquantes :**
 
@@ -79,11 +83,13 @@
 
 | Propriété | Valeur |
 |-----------|--------|
-| Fichier   | `gym_members_exercise_tracking.csv` |
-| Statut    | OK |
-| Lignes    | 973 |
-| Colonnes  | 15 |
-| Doublons  | 0 |
+| Fichier         | `gym_members_exercise_tracking.csv` |
+| Statut          | OK |
+| Lignes brutes   | 973 |
+| Lignes chargées | 973 |
+| Lignes sautées  | 0 |
+| Colonnes        | 15 |
+| Doublons        | 0 |
 
 ✅ Aucune valeur manquante
 
@@ -111,11 +117,13 @@
 
 | Propriété | Valeur |
 |-----------|--------|
-| Fichier   | `gym_members_exercise_tracking_synthetic_data.csv` |
-| Statut    | OK |
-| Lignes    | 1800 |
-| Colonnes  | 15 |
-| Doublons  | 0 |
+| Fichier         | `gym_members_exercise_tracking_synthetic_data.csv` |
+| Statut          | OK |
+| Lignes brutes   | 1800 |
+| Lignes chargées | 1800 |
+| Lignes sautées  | 0 |
+| Colonnes        | 15 |
+| Doublons        | 0 |
 
 **Valeurs manquantes :**
 
