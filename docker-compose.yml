@@ -48,12 +48,6 @@ services:
     # s'assurer que le code embarqué dans l'image (COPY . .) est utilisé.
     networks:
       - healthai_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
 
   # ─────────────────────────────────────────────
   # PIPELINE ETL (Houssem)
@@ -100,9 +94,7 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      api:
-        # FIX : attendre que l'API soit vraiment prête avant de démarrer
-        condition: service_healthy
+      - api
     networks:
       - healthai_network
 
