@@ -1,7 +1,7 @@
 # Rapport de nettoyage des données
 
 **Projet** : HealthAI Coach — Backend Métier  
-**Généré le** : 06/04/2026 à 08:46  
+**Généré le** : 06/04/2026 à 08:50  
 
 ---
 
