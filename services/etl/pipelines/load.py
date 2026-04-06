@@ -82,6 +82,10 @@ def load_nutrition_items():
     with engine.connect() as conn:
         for _, row in df.iterrows():
             try:
+                # Valider meal_type avec énumération
+                _meal_raw = str(row.get("meal_type", "")).strip().lower() if pd.notna(row.get("meal_type")) else None
+                _valid_meals = ["breakfast", "lunch", "dinner", "snack"]
+
                 conn.execute(text("""
                     INSERT INTO nutrition_items (id, name, category, meal_type,
                         calories, proteins_g, carbs_g, fats_g, fiber_g,
@@ -94,7 +98,7 @@ def load_nutrition_items():
                     "id":            str(uuid.uuid4()),
                     "name":          str(row.get("name", ""))[:255],
                     "category":      str(row.get("category", ""))[:100] if pd.notna(row.get("category")) else None,
-                    "meal_type":     str(row.get("meal_type", ""))[:50] if pd.notna(row.get("meal_type")) else None,
+                    "meal_type":     _meal_raw if _meal_raw in _valid_meals else None,
                     "calories":      float(row["calories"])      if "calories"      in row and pd.notna(row["calories"])      else 0,
                     "proteins_g":    float(row["proteins_g"])    if "proteins_g"    in row and pd.notna(row["proteins_g"])    else 0,
                     "carbs_g":       float(row["carbs_g"])       if "carbs_g"       in row and pd.notna(row["carbs_g"])       else 0,

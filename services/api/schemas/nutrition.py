@@ -50,7 +50,7 @@ class FoodLogCreate(BaseModel):
     """Request POST pour logger un aliment"""
     nutrition_item_id: uuid.UUID
     quantity_g: float = Field(..., gt=0, le=9999.99)
-    meal_type: str = Field(..., regex=r'^(breakfast|lunch|dinner|snack)$')
+    meal_type: str = Field(..., pattern=r'^(breakfast|lunch|dinner|snack)$')
 
 
 class FoodLogOut(BaseModel):

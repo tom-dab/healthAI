@@ -14,7 +14,7 @@ class ExerciseBase(BaseModel):
     type: Optional[str] = Field(None, max_length=50)
     muscle_group: Optional[str] = Field(None, max_length=100)
     equipment: Optional[str] = Field(None, max_length=100)
-    difficulty: str = Field(..., regex=r'^(beginner|intermediate|advanced)$')
+    difficulty: str = Field(..., pattern=r'^(beginner|intermediate|advanced)$')
     instructions: Optional[str] = None
     external_id: Optional[str] = Field(None, max_length=100)
     source: Optional[str] = Field(None, max_length=100)
@@ -31,7 +31,7 @@ class ExerciseUpdate(BaseModel):
     type: Optional[str] = Field(None, max_length=50)
     muscle_group: Optional[str] = Field(None, max_length=100)
     equipment: Optional[str] = Field(None, max_length=100)
-    difficulty: Optional[str] = Field(None, regex=r'^(beginner|intermediate|advanced)$')
+    difficulty: Optional[str] = Field(None, pattern=r'^(beginner|intermediate|advanced)$')
     instructions: Optional[str] = None
     external_id: Optional[str] = Field(None, max_length=100)
     source: Optional[str] = Field(None, max_length=100)
