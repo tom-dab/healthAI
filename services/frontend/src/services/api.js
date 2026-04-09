@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:9000",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
   timeout: 5000
 });
 
@@ -61,9 +61,9 @@ export const exercisesAPI = {
 };
 
 // ─── FONCTIONS DE COMPATIBILITÉ (pour migration progressive) ───
-export const getUsers = () => usersAPI.getUsers({ limit: 1000 });
-export const getExercises = () => exercisesAPI.getExercises({ limit: 1000 });
-export const getFoods = () => nutritionAPI.getNutritionItems({ limit: 1000 });
+export const getUsers = () => usersAPI.getUsers({ limit: 100 });
+export const getExercises = () => exercisesAPI.getExercises({ limit: 100 });
+export const getFoods = () => nutritionAPI.getNutritionItems({ limit: 100 });
 export const getMetrics = () => Promise.resolve({ data: [] }); // TODO: implémenter métriques
 
 export default api;
