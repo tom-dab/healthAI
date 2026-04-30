@@ -1,66 +1,47 @@
-"""
-HealthAI Coach — Nutrition Schemas
-Schémas Pydantic pour validation et sérialisation des données nutrition
-"""
-from pydantic import BaseModel, Field
-from typing import Optional
-import uuid
 from datetime import datetime
+from decimal import Decimal
+from typing import Optional
+from uuid import UUID
+
+from schemas.common import ORMBaseSchema
 
 
-class NutritionItemBase(BaseModel):
-    """Base schema pour nutrition item"""
-    name: str = Field(..., min_length=1, max_length=255)
-    category: Optional[str] = Field(None, max_length=100)
-    calories: Optional[float] = Field(None, ge=0, le=9999.99)
-    proteins_g: Optional[float] = Field(None, ge=0, le=999.99)
-    carbs_g: Optional[float] = Field(None, ge=0, le=999.99)
-    fats_g: Optional[float] = Field(None, ge=0, le=999.99)
-    fiber_g: Optional[float] = Field(None, ge=0, le=999.99)
-    source: Optional[str] = Field(None, max_length=100)
+class NutritionItemBase(ORMBaseSchema):
+    name: str
+    category: Optional[str] = None
+    meal_type: Optional[str] = None
+    calories: Optional[Decimal] = None
+    proteins_g: Optional[Decimal] = None
+    carbs_g: Optional[Decimal] = None
+    fats_g: Optional[Decimal] = None
+    fiber_g: Optional[Decimal] = None
+    sugar_g: Optional[Decimal] = None
+    sodium_mg: Optional[Decimal] = None
+    cholesterol_mg: Optional[Decimal] = None
+    water_ml: Optional[Decimal] = None
+    source: Optional[str] = None
 
 
 class NutritionItemCreate(NutritionItemBase):
-    """Request POST pour créer un nutrition item"""
     pass
 
 
-class NutritionItemUpdate(BaseModel):
-    """Request PUT pour mettre à jour un nutrition item"""
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
-    category: Optional[str] = Field(None, max_length=100)
-    calories: Optional[float] = Field(None, ge=0, le=9999.99)
-    proteins_g: Optional[float] = Field(None, ge=0, le=999.99)
-    carbs_g: Optional[float] = Field(None, ge=0, le=999.99)
-    fats_g: Optional[float] = Field(None, ge=0, le=999.99)
-    fiber_g: Optional[float] = Field(None, ge=0, le=999.99)
-    source: Optional[str] = Field(None, max_length=100)
+class NutritionItemUpdate(ORMBaseSchema):
+    name: Optional[str] = None
+    category: Optional[str] = None
+    meal_type: Optional[str] = None
+    calories: Optional[Decimal] = None
+    proteins_g: Optional[Decimal] = None
+    carbs_g: Optional[Decimal] = None
+    fats_g: Optional[Decimal] = None
+    fiber_g: Optional[Decimal] = None
+    sugar_g: Optional[Decimal] = None
+    sodium_mg: Optional[Decimal] = None
+    cholesterol_mg: Optional[Decimal] = None
+    water_ml: Optional[Decimal] = None
+    source: Optional[str] = None
 
 
-class NutritionItemOut(NutritionItemBase):
-    """Réponse GET pour nutrition item"""
-    id: uuid.UUID
+class NutritionItemRead(NutritionItemBase):
+    id: UUID
     created_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class FoodLogCreate(BaseModel):
-    """Request POST pour logger un aliment"""
-    nutrition_item_id: uuid.UUID
-    quantity_g: float = Field(..., gt=0, le=9999.99)
-    meal_type: str = Field(..., pattern=r'^(breakfast|lunch|dinner|snack)$')
-
-
-class FoodLogOut(BaseModel):
-    """Réponse GET pour food log"""
-    id: uuid.UUID
-    user_id: uuid.UUID
-    nutrition_item_id: uuid.UUID
-    quantity_g: float
-    meal_type: str
-    logged_at: datetime
-
-    class Config:
-        from_attributes = True

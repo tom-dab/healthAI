@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
+  baseURL: "http://localhost:8000",
   timeout: 5000
 });
 
@@ -33,12 +33,13 @@ export const usersAPI = {
 };
 
 // ─── NUTRITION ───
+//tojo: j' ai modifier le nominations /api/v1/nutrition par /api/v1/nutrition-items pour différencier les endpoints de gestion des aliments (CRUD) et les endpoints de journal alimentaire (logs) qui sont liés à un utilisateur spécifique. Cela permet une meilleure organisation et clarté dans l'API, en séparant clairement les ressources d'aliments des ressources de logs alimentaires.
 export const nutritionAPI = {
-  getNutritionItems: (params = {}) => api.get("/api/v1/nutrition", { params }),
-  getNutritionItem: (id) => api.get(`/api/v1/nutrition/${id}`),
-  createNutritionItem: (itemData) => api.post("/api/v1/nutrition", itemData),
-  updateNutritionItem: (id, itemData) => api.put(`/api/v1/nutrition/${id}`, itemData),
-  deleteNutritionItem: (id) => api.delete(`/api/v1/nutrition/${id}`),
+  getNutritionItems: (params = {}) => api.get("/api/v1/nutrition-items", { params }),
+  getNutritionItem: (id) => api.get(`/api/v1/nutrition-items/${id}`),
+  createNutritionItem: (itemData) => api.post("/api/v1/nutrition-items", itemData),
+  updateNutritionItem: (id, itemData) => api.put(`/api/v1/nutrition-items/${id}`, itemData),
+  deleteNutritionItem: (id) => api.delete(`/api/v1/nutrition-items/${id}`),
 
   // Food Logs
   getFoodLogs: (userId, params = {}) => api.get(`/api/v1/users/${userId}/food-logs`, { params }),
@@ -61,9 +62,9 @@ export const exercisesAPI = {
 };
 
 // ─── FONCTIONS DE COMPATIBILITÉ (pour migration progressive) ───
-export const getUsers = () => usersAPI.getUsers({ limit: 100 });
-export const getExercises = () => exercisesAPI.getExercises({ limit: 100 });
-export const getFoods = () => nutritionAPI.getNutritionItems({ limit: 100 });
+export const getUsers = () => usersAPI.getUsers({ limit: 1000 });
+export const getExercises = () => exercisesAPI.getExercises({ limit: 1000 });
+export const getFoods = () => nutritionAPI.getNutritionItems({ limit: 1000 });
 export const getMetrics = () => Promise.resolve({ data: [] }); // TODO: implémenter métriques
 
 export default api;

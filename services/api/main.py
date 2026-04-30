@@ -13,13 +13,10 @@ from contextlib import asynccontextmanager
 from core.config import settings
 from core.database import engine, Base, SessionLocal
 
-# Import des modèles (crucial pour que SQLAlchemy les crée)
-from models.user import User  # noqa: F401
-from models.nutrition import NutritionItem, FoodLog  # noqa: F401
-from models.exercise import Exercise, WorkoutLog  # noqa: F401
+# Import des modèles
+from models.user import User
 
-# Import des routers
-from routers import auth, users, nutrition, exercises, metrics
+from routers import api_router
 
 # ─────────────────────────────────────────────────────────────────
 # Startup: Créer les tables à la première exécution
@@ -28,9 +25,9 @@ from routers import auth, users, nutrition, exercises, metrics
 async def lifespan(app: FastAPI):
     """Gère le cycle de vie de l'application."""
     # Startup
-    print("🚀 Démarrage HealthAI Coach API...")
+    print(" Démarrage HealthAI Coach API...")
     Base.metadata.create_all(bind=engine)
-    print("✅ Tables créées (ou vérifiées)")
+    print(" Tables créées (ou vérifiées)")
     
     # Créer admin par défaut si aucun admin n'existe
     db = SessionLocal()
@@ -42,25 +39,23 @@ async def lifespan(app: FastAPI):
                 email="admin@healthai.com",
                 username="admin",
                 password_hash=hash_password("admin123"),
-                first_name="Admin",
-                last_name="System",
                 role="admin",
                 plan="premium_plus"
             )
             db.add(admin_user)
             db.commit()
-            print("✅ Admin par défaut créé: admin@healthai.com / admin123")
+            print(" Admin par défaut créé: admin@healthai.com / admin123")
         else:
-            print("✅ Admin déjà présent")
+            print(" Admin déjà présent")
     except Exception as e:
-        print(f"⚠️ Erreur création admin: {e}")
+        print(f" Erreur création admin: {e}")
     finally:
         db.close()
     
     yield
     
     # Shutdown
-    print("👋 Arrêt HealthAI Coach API...")
+    print(" Arrêt HealthAI Coach API...")
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -113,11 +108,7 @@ def health_check():
 # ─────────────────────────────────────────────────────────────────
 # Inclusion des routers
 # ─────────────────────────────────────────────────────────────────
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(nutrition.router)
-app.include_router(exercises.router)
-app.include_router(metrics.router)
+app.include_router(api_router, prefix='/api/v1')
 
 # À ajouter ultérieurement:
 # app.include_router(metrics.router)

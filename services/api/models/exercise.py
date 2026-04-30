@@ -2,7 +2,7 @@
 HealthAI Coach — Exercise Model
 Modèle SQLAlchemy pour exercises et workout_logs
 """
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 from sqlalchemy import Column, String, Text, Integer, Numeric, DateTime, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID
@@ -18,7 +18,7 @@ class Exercise(Base):
     __tablename__ = "exercises"
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
-    name = Column(String(255), nullable=False, index=True)
+    name = Column(String(255), nullable=False, unique=True, index=True)
     type = Column(String(50), nullable=True)  # cardio, strength, flexibility, etc.
     muscle_group = Column(String(100), nullable=True)  # chest, legs, arms, etc.
     equipment = Column(String(100), nullable=True)  # dumbbell, barbell, machine, etc.
@@ -28,7 +28,7 @@ class Exercise(Base):
     # Référence externe (ex: ExerciseDB API)
     external_id = Column(String(100), nullable=True)
     source = Column(String(100), nullable=True)  # ex: "ExerciseDB"
-    created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
     
     __table_args__ = (
         Index('idx_exercise_name', 'name'),
@@ -51,7 +51,8 @@ class WorkoutLog(Base):
     duration_min = Column(Integer, nullable=False)  # Durée en minutes
     sets = Column(Integer, nullable=True)  # Nombre de séries (pour strength)
     reps = Column(Integer, nullable=True)  # Répétitions par série
-    logged_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    calories_burned = Column(Numeric(7, 2), nullable=True)
+    logged_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
     
     __table_args__ = (
         Index('idx_workout_log_user', 'user_id'),
