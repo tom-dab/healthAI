@@ -92,7 +92,7 @@ services:
       # localhost:8000 est correct ici car c'est le navigateur qui appelle l'API
       VITE_API_URL: http://localhost:${API_PORT:-8000}
     ports:
-      - "3000:4173"
+      - "3000:80"
     depends_on:
       - api
     networks:
@@ -118,6 +118,29 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - healthai_network
+
+  # ─────────────────────────────────────────────
+  # MICRO-SERVICE RECOMMANDATIONS (Houssem/Tom)
+  # ─────────────────────────────────────────────
+  recommendation:
+    build:
+      context: ./services/recommendation
+      dockerfile: Dockerfile
+    container_name: healthai_recommendation
+    restart: unless-stopped
+    environment:
+      MONGO_URL: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongodb:27017/${MONGO_DB}?authSource=admin
+      MONGO_DB: ${MONGO_DB}
+      TRAINING_DATA_PATH: /app/training_data/gym_members_exercise_tracking.csv
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./services/etl/data/raw:/app/training_data:ro
+    depends_on:
+      mongodb:
+        condition: service_healthy
     networks:
       - healthai_network
 
