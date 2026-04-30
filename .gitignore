@@ -9,6 +9,7 @@
 *.key
 *.pem
 secrets/
+.env.example
 
 # ─── Python ──────────────────────────────────────
 __pycache__/
