@@ -8,14 +8,12 @@ from typing import Generator
 
 from .config import settings
 
-# ─────────────────────────────────────────────────────────────────
-# Engine et SessionLocal
-# ─────────────────────────────────────────────────────────────────
+
 engine = create_engine(
     settings.database_url,
-    echo=settings.debug,  # Afficher les requêtes SQL si debug=True
+    echo=settings.debug,
     future=True,
-    pool_pre_ping=True,  # Vérifier la connexion avant chaque requête
+    pool_pre_ping=True,  
 )
 
 SessionLocal = sessionmaker(
@@ -25,15 +23,10 @@ SessionLocal = sessionmaker(
     future=True,
 )
 
-# ─────────────────────────────────────────────────────────────────
-# Base pour les modèles SQLAlchemy
-# ─────────────────────────────────────────────────────────────────
+
 Base = declarative_base()
 
 
-# ─────────────────────────────────────────────────────────────────
-# Dépendance FastAPI pour obtenir une session DB
-# ─────────────────────────────────────────────────────────────────
 def get_db() -> Generator[Session, None, None]:
     """
     Dépendance FastAPI : fournit une session DB pour chaque request.

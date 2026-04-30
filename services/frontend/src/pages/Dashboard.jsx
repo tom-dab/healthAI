@@ -34,7 +34,7 @@ export default function Dashboard() {
         let user_count_with_weight = 0;
         let user_count_with_height = 0;
 
-        users.forEach(user => {
+        /*users.forEach(user => {
           // Plans
           plans[user.plan] = (plans[user.plan] || 0) + 1;
           
@@ -50,7 +50,23 @@ export default function Dashboard() {
             total_height += user.height_cm;
             user_count_with_height++;
           }
-        });
+        });*/
+        //j'ai modifier le code car weight_kg et height_cm sont des string dans la base de données, il faut les parser en float pour faire les calculs correctement. J'ai aussi ajouté une vérification pour s'assurer que les valeurs sont des nombres valides avant de les inclure dans les totaux.
+        users.forEach(user => {
+          plans[user.plan] = (plans[user.plan] || 0) + 1;
+          genders[user.gender] = (genders[user.gender] || 0) + 1;
+          const weight = parseFloat(user.weight_kg);
+          if (!isNaN(weight) && weight > 0) {
+            total_weight += weight;
+            user_count_with_weight++;
+          }
+        
+          const height = parseFloat(user.height_cm);
+          if (!isNaN(height) && height > 0) {
+            total_height += height;
+            user_count_with_height++;
+          }
+        }); 
 
         const metrics = {
           total_users: users.length,
