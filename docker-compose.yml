@@ -99,6 +99,29 @@ services:
       - healthai_network
 
   # ─────────────────────────────────────────────
+  # BASE DE DONNÉES MONGODB (Houssem — micro-service)
+  # ─────────────────────────────────────────────
+  mongodb:
+    image: mongo:7
+    container_name: healthai_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - healthai_network
+
+  # ─────────────────────────────────────────────
   # DASHBOARD METABASE (Houssem)
   # ─────────────────────────────────────────────
   metabase:
@@ -138,6 +161,7 @@ services:
 
 volumes:
   postgres_data:
+  mongo_data:
 
 networks:
   healthai_network:
