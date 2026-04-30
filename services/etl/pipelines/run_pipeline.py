@@ -1,18 +1,4 @@
-"""
-HealthAI Coach — ETL Pipeline
-Orchestrateur principal : Extract → Transform → Load
 
-Flux :
-  1. ingestion.py    — inventaire des datasets bruts
-  2. nettoyage_v2.py — nettoyage + export vers clean_bdd/ et clean_ml/
-  3. load.py         — insertion en base PostgreSQL
-
-Tables remplies :
-  nutrition_items  ← daily_food_nutrition_dataset.csv
-  users            ← gym_members_exercise + synthetic
-  user_metrics     ← gym_members_exercise + synthetic
-  health_profiles  ← diet_recommendations_dataset.csv
-"""
 import sys
 import os
 from loguru import logger

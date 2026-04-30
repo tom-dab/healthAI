@@ -1,15 +1,4 @@
-"""
-HealthAI Coach — ETL Load
-Étape 3/3 : Chargement des données nettoyées dans PostgreSQL
 
-Sources → Tables :
-  clean_bdd/daily_food_nutrition_bdd.csv  → nutrition_items
-  clean_bdd/gym_members_exercise_bdd.csv  → users + user_metrics
-  clean_bdd/gym_members_synthetic_bdd.csv → users + user_metrics (supplément)
-  clean_bdd/diet_recommendations_bdd.csv  → health_profiles
-  simulé                                  → exercises
-  simulé                                  → food_logs
-"""
 import os
 import uuid
 import random

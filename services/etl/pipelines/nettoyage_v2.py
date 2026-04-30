@@ -1,11 +1,4 @@
-"""
-HealthAI Coach — ETL Transform
-Étape 2/3 : Nettoyage et transformation des données brutes
 
-Deux sorties par dataset :
-  - clean_bdd/  → pour PostgreSQL (NULL conservés, types corrigés)
-  - clean_ml/   → pour Machine Learning (NULL supprimés, encodage, normalisation)
-"""
 import pandas as pd
 import os
 from datetime import datetime

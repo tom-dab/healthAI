@@ -1,7 +1,4 @@
-"""
-HealthAI Coach — Security Module
-JWT tokens, password hashing, current_user dependency
-"""
+
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import jwt
@@ -17,12 +14,12 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:
-    """Hache un mot de passe avec bcrypt."""
+   
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Vérifie un mot de passe contre son hash."""
+    
     return pwd_context.verify(plain_password, hashed_password)
 
 
@@ -30,16 +27,6 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # JWT Tokens
 # ─────────────────────────────────────────────────────────────────
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    """
-    Crée un JWT token.
-    
-    Args:
-        data: Dictionnaire à encoder (ex: {"sub": user_id})
-        expires_delta: Durée d'expiration (défaut: 24h)
-    
-    Returns:
-        Token JWT encodé
-    """
     to_encode = data.copy()
     
     if expires_delta:
@@ -58,15 +45,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 
 
 def decode_token(token: str) -> Optional[dict]:
-    """
-    Décode un JWT token.
-    
-    Args:
-        token: Token JWT à décoder
-    
-    Returns:
-        Payload du token ou None si invalide
-    """
+
     try:
         payload = jwt.decode(
             token,
@@ -80,27 +59,10 @@ def decode_token(token: str) -> Optional[dict]:
         return None
 
 
-# ─────────────────────────────────────────────────────────────────
-# ─────────────────────────────────────────────────────────────────
-# User Authentication Dependencies
-# ─────────────────────────────────────────────────────────────────
+
 
 
 async def get_current_user(request: Request) -> str:
-    """
-    Dépendance FastAPI : extrait et valide le JWT du header Authorization.
-    
-    Utilisage:
-        @app.get("/protected")
-        async def protected_route(user_id: str = Depends(get_current_user)):
-            return {"user_id": user_id}
-    
-    Raises:
-        HTTPException: Si token invalide ou expiré
-    
-    Returns:
-        user_id (str) du token
-    """
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         raise HTTPException(
@@ -130,21 +92,9 @@ async def get_current_user(request: Request) -> str:
     return user_id
 
 
-# ─────────────────────────────────────────────────────────────────
-# Admin Role Dependencies
-# ─────────────────────────────────────────────────────────────────
+
 async def get_current_admin_user(request: Request) -> str:
-    """
-    Dépendance FastAPI : vérifie que l'utilisateur est admin.
-    
-    Utilisage:
-        @app.post("/admin-only")
-        async def admin_route(user_id: str = Depends(get_current_admin_user)):
-            return {"admin_action": "done"}
-    
-    Raises:
-        HTTPException: Si token invalide ou utilisateur non admin
-    """
+
     from sqlalchemy.orm import Session
     from .database import get_db
     from ..models.user import User
@@ -174,19 +124,7 @@ async def get_current_admin_user(request: Request) -> str:
 
 
 async def get_current_user_with_role(request: Request) -> dict:
-    """
-    Dépendance FastAPI : retourne user_id + role.
-    
-    Utilisage:
-        @app.get("/profile")
-        async def profile(user_data: dict = Depends(get_current_user_with_role)):
-            user_id = user_data["id"]
-            role = user_data["role"]
-            return {"user_id": user_id, "role": role}
-    
-    Returns:
-        {"id": user_id, "role": role}
-    """
+
     from sqlalchemy.orm import Session
     from .database import get_db
     from ..models.user import User
