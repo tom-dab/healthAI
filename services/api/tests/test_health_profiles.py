@@ -11,7 +11,7 @@ def test_create_health_profile(client, created_user):
         "severity": "mild",
         "physical_activity_level": "moderate",
         "cholesterol_mg_dl": 190.0,
-        "blood_pressure_mmhg": "120/80",
+        "blood_pressure_mmhg": 120.0,
         "glucose_mg_dl": 95.0,
         "dietary_restrictions": "low_sugar",
         "weekly_exercise_hours": 3.5,

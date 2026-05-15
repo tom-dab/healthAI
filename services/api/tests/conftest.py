@@ -7,7 +7,6 @@ from sqlalchemy.pool import StaticPool
 from core.database import Base, get_db
 from main import app
 
-# Base SQLite en mémoire — pas besoin de PostgreSQL
 SQLITE_URL = "sqlite:///:memory:"
 
 engine = create_engine(
@@ -16,12 +15,13 @@ engine = create_engine(
     poolclass=StaticPool,
 )
 
-# SQLite ne supporte pas les UUIDs natifs — on active le mode string
+
 @event.listens_for(engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
+
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -44,16 +44,18 @@ def create_tables():
     Base.metadata.drop_all(bind=engine)
 
 
-@pytest.fixture
+# scope="session" : créé une seule fois pour toute la suite de tests
+# évite les violations de contrainte UNIQUE sur name/email/username
+@pytest.fixture(scope="session")
 def client():
     return TestClient(app)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def created_user(client):
     payload = {
-        "email": "test@healthai.com",
-        "username": "testuser",
+        "email": "fixture@healthai.com",
+        "username": "fixture_user",
         "password": "secret123",
         "age": 30,
         "gender": "male",
@@ -63,17 +65,17 @@ def created_user(client):
     return r.json()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def created_exercise(client):
-    payload = {"name": "Squat", "difficulty": "beginner"}
+    payload = {"name": "Squat fixture", "difficulty": "beginner"}
     r = client.post("/api/v1/exercises/", json=payload)
     assert r.status_code == 201
     return r.json()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def created_nutrition_item(client):
-    payload = {"name": "Riz blanc", "calories": 130, "proteins_g": 2.7}
+    payload = {"name": "Riz blanc fixture", "calories": 130, "proteins_g": 2.7}
     r = client.post("/api/v1/nutrition-items/", json=payload)
     assert r.status_code == 201
     return r.json()

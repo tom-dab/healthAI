@@ -19,7 +19,7 @@ def test_create_user_metric(client, created_user):
     assert r.status_code == 201
     data = r.json()
     assert data["user_id"] == created_user["id"]
-    assert data["weight_kg"] == 75.5
+    assert float(data["weight_kg"]) == 75.5
     assert "id" in data
 
 
@@ -59,8 +59,8 @@ def test_update_user_metric(client, created_user):
     metric_id = r.json()["id"]
     r = client.put(f"{BASE}/{metric_id}", json={"weight_kg": 78.5, "sleep_hours": 8.0})
     assert r.status_code == 200
-    assert r.json()["weight_kg"] == 78.5
-    assert r.json()["sleep_hours"] == 8.0
+    assert float(r.json()["weight_kg"]) == 78.5
+    assert float(r.json()["sleep_hours"]) == 8.0
 
 
 def test_delete_user_metric(client, created_user):

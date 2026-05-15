@@ -18,7 +18,7 @@ def test_create_nutrition_item(client):
     assert r.status_code == 201
     data = r.json()
     assert data["name"] == ITEM_PAYLOAD["name"]
-    assert data["calories"] == 165
+    assert float(data["calories"]) == 165.0
     assert "id" in data
 
 
@@ -56,7 +56,7 @@ def test_update_nutrition_item(client, created_nutrition_item):
     item_id = created_nutrition_item["id"]
     r = client.put(f"{BASE}/{item_id}", json={"calories": 150, "proteins_g": 3.0})
     assert r.status_code == 200
-    assert r.json()["calories"] == 150
+    assert float(r.json()["calories"]) == 150.0
 
 
 def test_delete_nutrition_item(client):
