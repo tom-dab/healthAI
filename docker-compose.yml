@@ -92,7 +92,7 @@ services:
       # localhost:8000 est correct ici car c'est le navigateur qui appelle l'API
       VITE_API_URL: http://localhost:${API_PORT:-8000}
     ports:
-      - "3000:4173"
+      - "3000:80"
     depends_on:
       - api
     networks:
