@@ -144,6 +144,44 @@ services:
       - healthai_network
 
   # ─────────────────────────────────────────────
+  # API IA TPRE502 (Tojo)
+  # ─────────────────────────────────────────────
+  ai-api:
+    build:
+      context: ./services/ai-api
+      dockerfile: Dockerfile
+    container_name: healthai_ai_api
+    restart: unless-stopped
+    environment:
+      API_KEY: ${AI_API_KEY:-dev_key}
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3}
+      HF_TOKEN: ${HF_TOKEN:-}
+      HF_MODEL: ${HF_MODEL:-google/vit-base-patch16-224}
+      BACKEND_URL: http://api:8000
+    ports:
+      - "8002:8002"
+    depends_on:
+      - api
+      - ollama
+    networks:
+      - healthai_network
+
+  # ─────────────────────────────────────────────
+  # OLLAMA — LLM local (llama3)
+  # ─────────────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: healthai_ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - healthai_network
+
+  # ─────────────────────────────────────────────
   # DASHBOARD METABASE (Houssem)
   # ─────────────────────────────────────────────
   metabase:
@@ -184,6 +222,7 @@ services:
 volumes:
   postgres_data:
   mongo_data:
+  ollama_data:
 
 networks:
   healthai_network:
