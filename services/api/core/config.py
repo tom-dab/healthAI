@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     
     # Debug mode
     debug: bool = os.getenv("API_DEBUG", "false").lower() == "true"
+
+    # ─────────────────────────────────────────────────────────────────
+    # APIs externes — Vision AI
+    # ─────────────────────────────────────────────────────────────────
+    huggingface_api_key: str = os.getenv("HF_API_KEY", "")
+    google_vision_api_key: str = os.getenv("GOOGLE_VISION_API_KEY", "")
     
     # CORS
     cors_origins: List[str] = [
