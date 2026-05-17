@@ -70,9 +70,9 @@ export const getMetrics = () => Promise.resolve({ data: [] }); // TODO: impléme
 // ─── VISION IA ───────────────────────────────────────────────────────────────
 export const visionAPI = {
   analyze: (payload, config = {}) =>
-    api.post("/api/v1/vision/analyze", payload, { timeout: 30000, ...config }),
+    api.post("/api/v1/vision/analyze-meal", payload, { timeout: 30000, ...config }),
   getAnalysis: (analysisId) =>
-    api.get(`/api/v1/vision/analyze/${analysisId}`),
+    api.get(`/api/v1/vision/analyze-meal/${analysisId}`),
 };
 
 // ─── RECOMMANDATIONS FITNESS ──────────────────────────────────────────────────
