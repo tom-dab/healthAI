@@ -10,6 +10,8 @@ export default function Sidebar() {
     { path: "/users", label: "Users", icon: "👥" },
     { path: "/exercises", label: "Exercises", icon: "💪" },
     { path: "/nutrition", label: "Nutrition", icon: "🥗" },
+    { path: "/nutrition-ai", label: "Analyse IA",  icon: "🤖" },
+    { path: "/fitness",      label: "Fitness IA",  icon: "🏋️" },
     { path: "/data-quality", label: "Data Quality", icon: "✓" },
     { path: "/account", label: "Mon compte", icon: "👤" }
   ];

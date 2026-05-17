@@ -10,6 +10,9 @@ import DataQuality from "./pages/DataQuality";
 import Account from "./pages/Account";
 import Login from "./pages/Login";
 
+import NutritionAI from "./pages/NutritionAI";
+import FitnessRecommendations from "./pages/FitnessRecommendations";
+
 export default function App() {
   return (
     <BrowserRouter>

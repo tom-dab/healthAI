@@ -67,4 +67,18 @@ export const getExercises = () => exercisesAPI.getExercises({ limit: 1000 });
 export const getFoods = () => nutritionAPI.getNutritionItems({ limit: 1000 });
 export const getMetrics = () => Promise.resolve({ data: [] }); // TODO: implémenter métriques
 
+// ─── VISION IA ───────────────────────────────────────────────────────────────
+export const visionAPI = {
+  analyze: (payload, config = {}) =>
+    api.post("/api/v1/vision/analyze", payload, { timeout: 30000, ...config }),
+  getAnalysis: (analysisId) =>
+    api.get(`/api/v1/vision/analyze/${analysisId}`),
+};
+
+// ─── RECOMMANDATIONS FITNESS ──────────────────────────────────────────────────
+export const recommendationsAPI = {
+  getRecommendations: (profile, config = {}) =>
+    api.post("/api/v1/recommendations", profile, { timeout: 30000, ...config }),
+};
+
 export default api;
