@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(docker volume *)"
+      "Bash(docker volume *)",
+      "Bash(python -m pytest tests/test_vision_router.py -v)",
+      "PowerShell(Get-Command pytest -ErrorAction SilentlyContinue)",
+      "PowerShell($env:PYTHONPATH = \"c:\\\\Users\\\\Tom\\\\develop\\\\HealthAI\\\\healthAI\\\\services\\\\api\"; & \"c:\\\\Users\\\\Tom\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\python.exe\" -m pip show pytest 2>&1 | Select-Object -First 5)",
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\Tom\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\" -Directory | Where-Object { $_.Name -match \"pytest|venv\" } | Select-Object Name)",
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\Tom\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Scripts\\\\\" | Where-Object { $_.Name -match \"pytest\" } | Select-Object Name)",
+      "PowerShell(docker exec healthai_api python -m pytest tests/test_vision_router.py -v 2>&1)",
+      "PowerShell(docker cp \"c:\\\\Users\\\\Tom\\\\develop\\\\HealthAI\\\\healthAI\\\\services\\\\api\\\\tests\\\\test_vision_router.py\" healthai_api:/app/tests/test_vision_router.py 2>&1)"
     ]
   }
 }
