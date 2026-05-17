@@ -24,6 +24,8 @@ export default function App() {
         <Route path="/nutrition" element={<RequireAuth><Layout><Nutrition /></Layout></RequireAuth>} />
         <Route path="/data-quality" element={<RequireAuth><Layout><DataQuality /></Layout></RequireAuth>} />
         <Route path="/account" element={<RequireAuth><Layout><Account /></Layout></RequireAuth>} />
+        <Route path="/nutrition-ai" element={<RequireAuth><Layout><NutritionAI /></Layout></RequireAuth>} />
+        <Route path="/fitness" element={<RequireAuth><Layout><FitnessRecommendations /></Layout></RequireAuth>} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

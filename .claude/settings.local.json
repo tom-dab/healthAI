@@ -8,7 +8,17 @@
       "PowerShell(Get-ChildItem \"c:\\\\Users\\\\Tom\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Lib\\\\site-packages\" -Directory | Where-Object { $_.Name -match \"pytest|venv\" } | Select-Object Name)",
       "PowerShell(Get-ChildItem \"c:\\\\Users\\\\Tom\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Scripts\\\\\" | Where-Object { $_.Name -match \"pytest\" } | Select-Object Name)",
       "PowerShell(docker exec healthai_api python -m pytest tests/test_vision_router.py -v 2>&1)",
-      "PowerShell(docker cp \"c:\\\\Users\\\\Tom\\\\develop\\\\HealthAI\\\\healthAI\\\\services\\\\api\\\\tests\\\\test_vision_router.py\" healthai_api:/app/tests/test_vision_router.py 2>&1)"
+      "PowerShell(docker cp \"c:\\\\Users\\\\Tom\\\\develop\\\\HealthAI\\\\healthAI\\\\services\\\\api\\\\tests\\\\test_vision_router.py\" healthai_api:/app/tests/test_vision_router.py 2>&1)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(npm run *)",
+      "PowerShell(Get-ChildItem \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" -ErrorAction SilentlyContinue; Get-ChildItem \"$env:APPDATA\\\\npm\\\\npm.cmd\" -ErrorAction SilentlyContinue; Get-ChildItem \"C:\\\\Program Files\\\\nodejs\\\\\" -ErrorAction SilentlyContinue | Select-Object -First 5)",
+      "PowerShell(Get-ChildItem \"C:\\\\Program Files\\\\\" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match \"node\" }; Get-ChildItem \"$env:LOCALAPPDATA\\\\Programs\\\\\" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match \"node\" })",
+      "PowerShell(Get-ChildItem \"C:\\\\\" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match \"node|nvm\" }; Test-Path \"C:\\\\nvm\"; Test-Path \"$env:USERPROFILE\\\\.nvm\"; Test-Path \"$env:USERPROFILE\\\\AppData\\\\Roaming\\\\nvm\")",
+      "PowerShell(node -v)",
+      "PowerShell(npm -v)",
+      "PowerShell(Invoke-RestMethod -Method Post -Uri \"http://localhost:8000/auth/login\" -ContentType \"application/json\" -Body '{\"email\":\"admin@healthai.com\",\"password\":\"admin123\"}' 2>&1)"
     ]
   }
 }
