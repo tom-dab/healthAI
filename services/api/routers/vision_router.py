@@ -19,6 +19,8 @@ router = APIRouter(prefix="/vision", tags=["Vision IA"])
 _rate_store: dict[str, list[float]] = defaultdict(list)
 RATE_LIMIT = 10
 RATE_WINDOW = 3600
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
+ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 
 
 def _check_rate_limit(ip: str) -> int:
@@ -112,15 +114,28 @@ async def analyze_meal(
 
     analysis_id = uuid.uuid4()
     image_filename = ""
+    file_content: bytes | None = None
+
+    if file is not None:
+        file_content = await file.read()
+        if len(file_content) > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail="Fichier trop volumineux. Taille maximale : 5 MB.",
+            )
+        if file.content_type and file.content_type not in ALLOWED_CONTENT_TYPES:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Format non supporté : {file.content_type}. Formats acceptés : JPEG, PNG, WebP, GIF.",
+            )
+        image_filename = file.filename or "upload"
 
     try:
         form_data: dict = {"description": description or "", "health_goal": health_goal}
         files = None
 
-        if file is not None:
-            content = await file.read()
-            image_filename = file.filename or "upload"
-            files = {"image": (image_filename, content, file.content_type or "image/jpeg")}
+        if file_content is not None:
+            files = {"image": (image_filename, file_content, file.content_type or "image/jpeg")}
 
         async with httpx.AsyncClient(timeout=30.0) as client:
             ai_response = await client.post(

@@ -17,9 +17,12 @@ async def get_recommendations(request: RecommendationRequest):
         experience_level=request.experience_level,
     )
 
-    db = get_db()
-    cursor = db["exercises"].find({"workout_type": workout_type}, {"_id": 0})
-    raw_exercises = await cursor.to_list(length=100)
+    try:
+        db = get_db()
+        cursor = db["exercises"].find({"workout_type": workout_type}, {"_id": 0})
+        raw_exercises = await cursor.to_list(length=100)
+    except Exception:
+        raw_exercises = []
 
     filtered = recommender.filter_exercises(
         exercises=raw_exercises,

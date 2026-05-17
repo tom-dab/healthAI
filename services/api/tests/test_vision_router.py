@@ -187,3 +187,67 @@ def test_analyze_meal_no_input(client):
     with patch("routers.vision_router.httpx.AsyncClient", make_mock_client(json_data=AI_API_SUCCESS)):
         r = client.post(f"{BASE}/analyze-meal", data={})
     assert r.status_code == 200
+
+
+# ---------------------------------------------------------------------------
+# Groupe 6 — Upload multipart/form-data (fichier image réel)
+# ---------------------------------------------------------------------------
+
+def test_analyze_meal_multipart_file_upload(client):
+    fake_image = b"\xff\xd8\xff\xe0" + b"\x00" * 64  # header JPEG minimal
+    with patch("routers.vision_router.httpx.AsyncClient", make_mock_client(json_data=AI_API_SUCCESS)):
+        r = client.post(
+            f"{BASE}/analyze-meal",
+            files={"file": ("repas.jpg", fake_image, "image/jpeg")},
+            data={"description": "photo de repas", "health_goal": "equilibre"},
+        )
+    assert r.status_code == 200
+    data = r.json()
+    assert data["is_fallback"] is False
+    assert data["source"] == "huggingface"
+    assert len(data["detected_foods"]) >= 1
+    uuid.UUID(data["analysis_id"])
+
+
+def test_analyze_meal_file_too_large_returns_413(client):
+    large_file = b"\x00" * (5 * 1024 * 1024 + 1)  # 5 MB + 1 octet
+    r = client.post(
+        f"{BASE}/analyze-meal",
+        files={"file": ("big.jpg", large_file, "image/jpeg")},
+    )
+    assert r.status_code == 413
+    assert "detail" in r.json()
+
+
+def test_analyze_meal_unsupported_format_pdf_returns_422(client):
+    r = client.post(
+        f"{BASE}/analyze-meal",
+        files={"file": ("document.pdf", b"%PDF-1.4", "application/pdf")},
+    )
+    assert r.status_code == 422
+    assert "detail" in r.json()
+
+
+def test_analyze_meal_unsupported_format_txt_returns_422(client):
+    r = client.post(
+        f"{BASE}/analyze-meal",
+        files={"file": ("data.txt", b"just text", "text/plain")},
+    )
+    assert r.status_code == 422
+    assert "detail" in r.json()
+
+
+def test_analyze_meal_corrupted_image_triggers_fallback(client):
+    corrupt_bytes = b"\x00\x01\x02\x03"  # pas une image valide
+    with patch(
+        "routers.vision_router.httpx.AsyncClient",
+        make_mock_client(raise_exc=Exception("Image decode error")),
+    ):
+        r = client.post(
+            f"{BASE}/analyze-meal",
+            files={"file": ("corrupt.jpg", corrupt_bytes, "image/jpeg")},
+        )
+    assert r.status_code == 200  # pas de 500
+    data = r.json()
+    assert data["is_fallback"] is True
+    assert data["source"] == "fallback_manual"
