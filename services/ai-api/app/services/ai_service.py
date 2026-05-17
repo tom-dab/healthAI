@@ -1,6 +1,7 @@
 """Orchestrateur principal — cascade Cache → Ollama → HuggingFace → Fallback."""
 
 from app.services import cache_service, ollama_service, huggingface_service, fallback_service
+from app.services import backend_client
 
 SYSTEM_ANALYZE = """Tu es un expert en nutrition.
 Retourne UNIQUEMENT un JSON valide sans markdown ni texte avant/après.
@@ -101,29 +102,94 @@ async def generate_meal_plan(objectif: str, calories_cible: int, duree_jours: in
         return result
 
 
-async def recommend_activity(objectif: str, niveau: str, duree_seance_min: int,
-                              equipements: list[str], limitations: list[str]) -> dict:
+async def recommend_activity(
+    objectif: str,
+    niveau: str,
+    duree_seance_min: int,
+    equipements: list[str],
+    limitations: list[str],
+) -> dict:
+    import logging
+    logger = logging.getLogger(__name__)
+
     cache_key = cache_service.make_key("activity", {
-        "objectif": objectif, "niveau": niveau, "duree": duree_seance_min,
-        "equip": equipements, "limit": limitations,
+        "objectif": objectif,
+        "niveau": niveau,
+        "duree": duree_seance_min,
+        "equip": sorted(equipements),
+        "limit": sorted(limitations),
     })
     cached = cache_service.get(cache_key)
     if cached:
+        logger.info("Cache hit — activity recommend")
         return cached
 
-    user_msg = (
-        f"Génère un programme d'entraînement. "
-        f"Objectif: {objectif}. Niveau: {niveau}. "
-        f"Durée séance: {duree_seance_min} min. "
-        f"Équipements: {', '.join(equipements) if equipements else 'aucun'}. "
-        f"Limitations: {', '.join(limitations) if limitations else 'aucune'}."
-    )
-    try:
-        result = await ollama_service.generate(SYSTEM_ACTIVITY, user_msg)
-        result["source"] = "ollama"
-        cache_service.set(cache_key, result)
-        return result
-    except Exception:
+    # 1. Micro-service MongoDB (source de vérité, critère P1 éliminatoire)
+    niveau_map = {"debutant": 1, "intermediaire": 2, "avance": 3}
+    mongo_payload = {
+        "objective": objectif,
+        "experience_level": niveau_map.get(niveau, 1),
+        "limitations": limitations,
+        "equipment": equipements,
+    }
+    logger.info("Appel micro-service MongoDB — objectif=%s niveau=%s", objectif, niveau)
+    mongo_result = await backend_client.get_activity_recommendations(mongo_payload)
+
+    if mongo_result:
+        logger.info("MongoDB OK — workout_type=%s confidence=%s",
+                    mongo_result.get("recommended_workout_type"),
+                    mongo_result.get("confidence"))
+
+        exercises = mongo_result.get("exercises", [])
+        exercises_desc = ", ".join(ex["name"] for ex in exercises[:5]) or "exercices variés"
+
+        # 2. Enrichissement Ollama (conseils en langage naturel, optionnel)
+        user_msg = (
+            f"Programme {mongo_result.get('recommended_workout_type', 'fitness')} "
+            f"pour objectif '{objectif}', niveau '{niveau}', {duree_seance_min} min/séance. "
+            f"Exercices : {exercises_desc}. "
+            f"Donne uniquement 3 conseils d'entraînement et récupération, en français."
+        )
+        try:
+            llm_result = await ollama_service.generate(SYSTEM_ACTIVITY, user_msg)
+            conseils = llm_result.get("conseils", [])
+            source = "mongodb+ollama"
+        except Exception:
+            conseils = [
+                "Respectez les temps de repos entre chaque série.",
+                "Hydratez-vous régulièrement pendant l'effort.",
+                "Échauffez-vous 10 minutes avant de commencer.",
+            ]
+            source = "mongodb+fallback_conseils"
+
+        result = {
+            "programme": [
+                {
+                    "jour": i + 1,
+                    "type_seance": mongo_result.get("recommended_workout_type", "fitness"),
+                    "exercices": [
+                        {
+                            "nom": ex["name"],
+                            "series": ex.get("sets", 3),
+                            "repetitions": str(ex.get("reps", "12")),
+                            "repos_sec": ex.get("rest_seconds", 60),
+                        }
+                        for ex in exercises
+                    ],
+                    "duree_estimee_min": duree_seance_min,
+                }
+                for i in range(3)
+            ],
+            "conseils": conseils,
+            "source": source,
+            "confidence": mongo_result.get("confidence", 0.5),
+        }
+
+    else:
+        # 3. Fallback si MongoDB ET Ollama sont indisponibles
+        logger.warning("Fallback activé — MongoDB et Ollama indisponibles")
         result = fallback_service.activity_recommend_fallback(niveau)
-        cache_service.set(cache_key, result)
-        return result
+        result["source"] = "fallback_complet"
+
+    cache_service.set(cache_key, result)
+    return result
