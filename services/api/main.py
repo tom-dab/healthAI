@@ -17,6 +17,7 @@ from core.database import engine, Base, SessionLocal
 from models.user import User
 
 from routers import api_router
+from routers.auth_router import router as auth_router
 
 # ─────────────────────────────────────────────────────────────────
 # Startup: Créer les tables à la première exécution
@@ -108,6 +109,7 @@ def health_check():
 # ─────────────────────────────────────────────────────────────────
 # Inclusion des routers
 # ─────────────────────────────────────────────────────────────────
+app.include_router(auth_router)
 app.include_router(api_router, prefix='/api/v1')
 
 # À ajouter ultérieurement:
