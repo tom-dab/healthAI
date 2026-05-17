@@ -15,6 +15,7 @@ from core.database import engine, Base, SessionLocal
 
 # Import des modèles
 from models.user import User
+from models.meal_analysis import MealAnalysis  # noqa: F401 — requis pour Base.metadata.create_all
 
 from routers import api_router
 
