@@ -204,6 +204,20 @@ services:
       - healthai_network
 
   # ─────────────────────────────────────────────
+  # MAQUETTES TPRE502 (wireframes statiques)
+  # ─────────────────────────────────────────────
+  maquettes:
+    image: nginx:alpine
+    container_name: healthai_maquettes
+    restart: unless-stopped
+    volumes:
+      - ./docs/maquettes:/usr/share/nginx/html:ro
+    ports:
+      - "3002:80"
+    networks:
+      - healthai_network
+
+  # ─────────────────────────────────────────────
   # ADMINER - Interface BDD (dev uniquement)
   # ─────────────────────────────────────────────
   adminer:
