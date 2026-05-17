@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     
     # Debug mode
     debug: bool = os.getenv("API_DEBUG", "false").lower() == "true"
+
+    # Micro-service IA
+    ai_api_key: str = "dev_key"
     
     # CORS
     cors_origins: List[str] = [
