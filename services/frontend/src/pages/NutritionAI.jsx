@@ -115,14 +115,15 @@ export default function NutritionAI() {
     setFallback(false);
     setResult(null);
     try {
-      const base64 = await fileToBase64(file);
+      const formData = new FormData();
+      formData.append("file", file);
       const response = await visionAPI.analyze(
-        { image_base64: base64, filename: file.name },
+        formData,
         { signal: controller.signal, timeout: TIMEOUT_MS }
       );
       const data = response.data;
       setResult(data);
-      setFallback(data.fallback_used ?? false);
+      setFallback(data.is_fallback ?? false);
       setRemaining(response.headers?.["x-ratelimit-remaining"] ?? null);
       setStatus("success");
     } catch (err) {
@@ -171,7 +172,7 @@ export default function NutritionAI() {
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>Aliments détectés</h3>
           <ul className={styles.foodList} aria-label="Liste des aliments identifiés">
-            {data.foods_detected?.map((food, i) => (
+            {data.detected_foods?.map((food, i) => (
               <li key={i} className={styles.foodItem}>
                 <span className={styles.foodDot} aria-hidden="true">●</span>{food}
               </li>
@@ -181,22 +182,22 @@ export default function NutritionAI() {
         <div className={styles.section}>
           <div className={styles.caloriesRow}>
             <span className={styles.caloriesLabel}>Calories estimées</span>
-            <strong className={styles.caloriesValue} aria-label={`${data.calories} kilocalories`}>
-              {data.calories} <small>kcal</small>
+            <strong className={styles.caloriesValue} aria-label={`${data.nutrition?.calories} kilocalories`}>
+              {data.nutrition?.calories} <small>kcal</small>
             </strong>
           </div>
         </div>
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>Macronutriments</h3>
           <div className={styles.macros}>
-            <MacroBar label="Protéines" value={data.macros?.protein_g ?? 0} unit="g" color="#3b82f6" max={100} />
-            <MacroBar label="Glucides"  value={data.macros?.carbs_g   ?? 0} unit="g" color="#f59e0b" max={200} />
-            <MacroBar label="Lipides"   value={data.macros?.fat_g     ?? 0} unit="g" color="#ef4444" max={80}  />
+            <MacroBar label="Protéines" value={data.nutrition?.proteins_g ?? 0} unit="g" color="#3b82f6" max={100} />
+            <MacroBar label="Glucides"  value={data.nutrition?.carbs_g   ?? 0} unit="g" color="#f59e0b" max={200} />
+            <MacroBar label="Lipides"   value={data.nutrition?.fats_g    ?? 0} unit="g" color="#ef4444" max={80}  />
           </div>
         </div>
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>Balance nutritionnelle</h3>
-          <BalanceBadge balance={data.nutritional_balance} />
+          <BalanceBadge balance={data.balance} />
         </div>
         {data.recommendations?.length > 0 && (
           <div className={styles.section}>

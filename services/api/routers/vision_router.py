@@ -146,16 +146,20 @@ async def analyze_meal(
 
     fallback_response = MealAnalysisResponse(
         analysis_id=analysis_id,
-        detected_foods=[],
+        detected_foods=["repas estimé (service IA indisponible)"],
         nutrition=NutritionSummary(
-            calories=0, proteins_g=0, carbs_g=0, fats_g=0, is_estimated=True
+            calories=450, proteins_g=22, carbs_g=58, fats_g=14, is_estimated=True
         ),
-        balance="unknown",
-        recommendations=[],
+        balance="balanced",
+        recommendations=[
+            "Service d'analyse IA temporairement indisponible.",
+            "Les valeurs affichées sont des estimations génériques pour un repas équilibré moyen.",
+            "Réessayez dans quelques instants pour une analyse précise de votre repas.",
+        ],
         confidence=0.0,
         source="fallback_manual",
         is_fallback=True,
-        message="Analyse IA indisponible, veuillez réessayer.",
+        message="Analyse IA indisponible — estimations génériques affichées.",
     )
     _save_analysis(db, fallback_response, image_filename)
     return fallback_response
