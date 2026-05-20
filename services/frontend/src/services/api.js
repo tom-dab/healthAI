@@ -81,4 +81,16 @@ export const recommendationsAPI = {
     api.post("/api/v1/recommendations", profile, { timeout: 30000, ...config }),
 };
 
+// ─── ML PRÉDICTIF (ml2 Random Forest — port 8002) ────────────────────────────
+const mlApi = axios.create({
+  baseURL: "http://localhost:8002",
+  timeout: 15000,
+  headers: { "x-api-key": "dev_key" },
+});
+
+export const mlAPI = {
+  predictDiet:         (data) => mlApi.post("/ml/predict-diet", data),
+  predictFitnessLevel: (data) => mlApi.post("/ml/predict-fitness-level", data),
+};
+
 export default api;

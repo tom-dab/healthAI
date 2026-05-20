@@ -159,11 +159,13 @@ services:
       HF_TOKEN: ${HF_TOKEN:-}
       HF_MODEL: ${HF_MODEL:-google/vit-base-patch16-224}
       BACKEND_URL: http://api:8000
+      ML_MODELS_PATH: /app/models
+    volumes:
+      - ./services/ml2/models:/app/models:ro
     ports:
       - "8002:8002"
     depends_on:
       - api
-      - ollama
     networks:
       - healthai_network
 

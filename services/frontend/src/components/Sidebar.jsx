@@ -11,7 +11,8 @@ export default function Sidebar() {
     { path: "/exercises", label: "Exercises", icon: "💪" },
     { path: "/nutrition", label: "Nutrition", icon: "🥗" },
     { path: "/nutrition-ai", label: "Analyse IA",  icon: "🤖" },
-    { path: "/fitness",      label: "Fitness IA",  icon: "🏋️" },
+    { path: "/fitness",         label: "Fitness IA",     icon: "🏋️" },
+    { path: "/ml-predictions",  label: "Prédictions ML", icon: "🧠" },
     { path: "/data-quality", label: "Data Quality", icon: "✓" },
     { path: "/account", label: "Mon compte", icon: "👤" }
   ];

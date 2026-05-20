@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 
 import NutritionAI from "./pages/NutritionAI";
 import FitnessRecommendations from "./pages/FitnessRecommendations";
+import MLPredictions from "./pages/MLPredictions";
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/account" element={<RequireAuth><Layout><Account /></Layout></RequireAuth>} />
         <Route path="/nutrition-ai" element={<RequireAuth><Layout><NutritionAI /></Layout></RequireAuth>} />
         <Route path="/fitness" element={<RequireAuth><Layout><FitnessRecommendations /></Layout></RequireAuth>} />
+        <Route path="/ml-predictions" element={<RequireAuth><Layout><MLPredictions /></Layout></RequireAuth>} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

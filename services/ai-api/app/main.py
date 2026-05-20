@@ -4,7 +4,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 
 from app.middleware.rate_limiter import limiter
-from app.routes import nutrition, meal_plan, activity, health
+from app.routes import nutrition, meal_plan, activity, health, ml
 
 app = FastAPI(
     title="HealthAI Coach — API IA",
@@ -28,6 +28,7 @@ app.include_router(nutrition.router)
 app.include_router(meal_plan.router)
 app.include_router(activity.router)
 app.include_router(health.router)
+app.include_router(ml.router)
 
 
 @app.get("/", include_in_schema=False)
