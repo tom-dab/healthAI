@@ -1,7 +1,10 @@
-"""Orchestrateur principal — cascade Cache → Ollama → HuggingFace → Fallback."""
+"""Orchestrateur principal — cascade Cache → HuggingFace → Ollama → Fallback."""
 
+import logging
 from app.services import cache_service, ollama_service, huggingface_service, fallback_service
 from app.services import backend_client
+
+logger = logging.getLogger(__name__)
 
 SYSTEM_ANALYZE = """Tu es un expert en nutrition.
 Retourne UNIQUEMENT un JSON valide sans markdown ni texte avant/après.
@@ -49,27 +52,39 @@ async def analyze_nutrition(description: str, health_goal: str, image_bytes: byt
     cache_key = cache_service.make_key("analyze", {"desc": description, "goal": health_goal})
     cached = cache_service.get(cache_key)
     if cached:
+        logger.info("[cascade] Cache hit — résultat servi depuis le cache")
         return cached
 
     aliments_desc = description
+
+    # Étape 1 — HuggingFace (classification image)
     if image_bytes:
+        logger.info("[cascade] Étape 1/3 — HuggingFace : classification de l'image...")
         try:
             labels = await huggingface_service.classify_image(image_bytes)
             aliments_desc = ", ".join(labels)
-        except Exception:
-            pass
+            logger.info("[cascade] HuggingFace OK — labels détectés : %s", aliments_desc)
+        except Exception as exc:
+            logger.warning("[cascade] HuggingFace KO (%s: %s) — passage à Ollama", type(exc).__name__, exc)
+    else:
+        logger.info("[cascade] Pas d'image — étape HuggingFace ignorée, description : %r", description)
 
+    # Étape 2 — Ollama (analyse nutritionnelle LLM)
+    logger.info("[cascade] Étape 2/3 — Ollama (%s) : génération de l'analyse...", "ollama" )
     try:
         result = await ollama_service.generate(
             SYSTEM_ANALYZE,
             f"Analyse ce repas (objectif: {health_goal}): {aliments_desc}",
         )
         result["source"] = "ollama"
+        logger.info("[cascade] Ollama OK — source=ollama score_sante=%s", result.get("score_sante"))
         cache_service.set(cache_key, result)
         return result
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("[cascade] Ollama KO (%s: %s) — activation du fallback", type(exc).__name__, exc)
 
+    # Étape 3 — Fallback statique
+    logger.warning("[cascade] Étape 3/3 — Fallback : valeurs estimées génériques retournées")
     result = fallback_service.nutrition_analyze_fallback(aliments_desc)
     cache_service.set(cache_key, result)
     return result

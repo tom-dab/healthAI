@@ -165,8 +165,12 @@ export default function NutritionAI() {
       <section className={styles.resultCard} aria-labelledby="result-title">
         <div className={styles.resultHeader}>
           <h2 id="result-title" className={styles.resultTitle}>Résultats de l'analyse</h2>
-          {isFallback && (
-            <span className={styles.fallbackBadge} role="alert">⚠ Mode dégradé — API indisponible</span>
+          {isFallback ? (
+            <span className={styles.fallbackBadge} role="alert">⚠ Mode dégradé — valeurs estimées</span>
+          ) : (
+            <span className={styles.sourceBadge} role="status">
+              ✓ Source : {data.source === "ollama" ? "Ollama LLM" : data.source === "huggingface" ? "HuggingFace" : data.source}
+            </span>
           )}
         </div>
         <div className={styles.section}>
@@ -207,6 +211,12 @@ export default function NutritionAI() {
                 <li key={i} className={styles.recommendItem}><span aria-hidden="true">💡</span> {rec}</li>
               ))}
             </ul>
+          </div>
+        )}
+        {isFallback && (
+          <div className={styles.fallbackDetail} role="note">
+            <p>🔄 <strong>Cascade IA tentée :</strong> HuggingFace → Ollama → valeurs génériques</p>
+            <p>Les services IA (Ollama / HuggingFace) sont indisponibles. Les macros affichées sont des estimations pour un repas moyen équilibré.</p>
           </div>
         )}
         {data.analysis_id && (

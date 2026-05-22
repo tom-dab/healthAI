@@ -18,7 +18,12 @@
       "PowerShell(Get-ChildItem \"C:\\\\\" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match \"node|nvm\" }; Test-Path \"C:\\\\nvm\"; Test-Path \"$env:USERPROFILE\\\\.nvm\"; Test-Path \"$env:USERPROFILE\\\\AppData\\\\Roaming\\\\nvm\")",
       "PowerShell(node -v)",
       "PowerShell(npm -v)",
-      "PowerShell(Invoke-RestMethod -Method Post -Uri \"http://localhost:8000/auth/login\" -ContentType \"application/json\" -Body '{\"email\":\"admin@healthai.com\",\"password\":\"admin123\"}' 2>&1)"
+      "PowerShell(Invoke-RestMethod -Method Post -Uri \"http://localhost:8000/auth/login\" -ContentType \"application/json\" -Body '{\"email\":\"admin@healthai.com\",\"password\":\"admin123\"}' 2>&1)",
+      "Bash(docker compose *)",
+      "Bash(dir .env*)",
+      "Bash(findstr healthai *)",
+      "Bash(git log *)",
+      "Bash(docker exec *)"
     ]
   }
 }
