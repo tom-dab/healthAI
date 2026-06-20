@@ -259,6 +259,64 @@ CREATE INDEX IF NOT EXISTS idx_workout_logs_logged_at ON workout_logs(logged_at)
 
 
 -- ─────────────────────────────────────────────────────────────────
+-- TABLE : nutrition_analyses
+-- Résultats de l'analyse de photos via l'API de vision
+-- Stocke ce que l'API renvoie : détection d'aliments, calories estimées, etc.
+-- ─────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS nutrition_analyses (
+    id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+    -- Métadonnées de la photo
+    image_url       VARCHAR(512),
+    image_size_kb   INTEGER,
+
+    -- Résultats de l'API de vision
+    detected_items  JSONB,                 -- [{name, confidence, portion_g, calories}, ...]
+    total_calories  NUMERIC(7,2),
+    total_proteins_g NUMERIC(7,2),
+    total_carbs_g   NUMERIC(7,2),
+    total_fats_g    NUMERIC(7,2),
+
+    -- Qualité de la détection
+    confidence_score NUMERIC(4,3) CHECK (confidence_score >= 0 AND confidence_score <= 1),
+    is_valid        BOOLEAN DEFAULT TRUE,
+
+    -- Traçabilité
+    analyzed_at     TIMESTAMPTZ DEFAULT NOW(),
+    created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_nutrition_analyses_user_id   ON nutrition_analyses(user_id);
+CREATE INDEX IF NOT EXISTS idx_nutrition_analyses_analyzed_at ON nutrition_analyses(analyzed_at);
+
+
+-- ─────────────────────────────────────────────────────────────────
+-- TABLE : recommendation_sessions
+-- Lien entre utilisateur PostgreSQL et document MongoDB
+-- Une ligne = une recommandation générée, stockée en NoSQL
+-- ─────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS recommendation_sessions (
+    id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+    -- Référence MongoDB
+    mongodb_id      VARCHAR(255) NOT NULL,  -- ObjectId MongoDB stocké en string
+
+    -- Métadonnées
+    recommendation_type VARCHAR(50),         -- ex: 'diet', 'workout', 'sleep'
+    status          VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'completed', 'archived')),
+
+    -- Traçabilité
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_recommendation_sessions_user_id ON recommendation_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_recommendation_sessions_mongodb_id ON recommendation_sessions(mongodb_id);
+
+
+-- ─────────────────────────────────────────────────────────────────
 -- TRIGGER : mise à jour automatique de updated_at sur users
 -- ─────────────────────────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION update_updated_at()
@@ -271,6 +329,11 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER users_updated_at
     BEFORE UPDATE ON users
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+
+CREATE TRIGGER recommendation_sessions_updated_at
+    BEFORE UPDATE ON recommendation_sessions
     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 

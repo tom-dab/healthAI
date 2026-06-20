@@ -151,7 +151,7 @@ MB_DB_PASS=CHANGEZ_MOI_EN_PROD
 | Module       | Documentation                         | Responsable |
 |--------------|---------------------------------------|-------------|
 | ETL          | [docs/etl.md](docs/etl.md)           | Houssem     |
-| Base de données | [docs/data-model.md](docs/data-model.md) | Hanane  |
+|Base de données | [docs/data-model.md](docs/data-model.md) | Hanane  |
 | API REST     | [docs/api.md](docs/api.md)           | Tojo        |
 | Frontend     | [docs/frontend.md](docs/frontend.md) | Hélie       |
 | Dashboard    | [docs/dashboard.md](docs/dashboard.md) | Houssem   |
